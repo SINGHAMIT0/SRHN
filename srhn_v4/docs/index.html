@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SRHN v4 — Developer Documentation</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   SRHN v4 Developer Docs — IBM engineering aesthetic
+   Dark base, amber accents, monospace DNA
+═══════════════════════════════════════════════════ */
+:root {
+  --bg:     #0a0b0d;
+  --bg2:    #111318;
+  --bg3:    #1a1d24;
+  --bg4:    #22262f;
+  --border: #2a2e38;
+  --border2:#363c4a;
+  --amber:  #f0a500;
+  --amber2: #ffc433;
+  --blue:   #4d9ef7;
+  --green:  #3de68a;
+  --red:    #f05454;
+  --purple: #a78bfa;
+  --cyan:   #22d3ee;
+  --text:   #e8eaf0;
+  --text2:  #9098b0;
+  --text3:  #c5cad8;
+  --mono:   'IBM Plex Mono', monospace;
+  --sans:   'IBM Plex Sans', system-ui, sans-serif;
+  --sidebar-w: 270px;
+  --content-max: 860px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--sans);
+  font-size:15px;line-height:1.7;min-height:100vh;
+  display:flex;flex-direction:column;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── Top bar ── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:52px;background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 20px;gap:16px;
+}
+.topbar-logo{
+  font-family:var(--mono);font-size:13px;font-weight:600;
+  color:var(--amber);letter-spacing:.5px;white-space:nowrap;
+}
+.topbar-logo span{color:var(--text2)}
+.topbar-pills{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.pill{
+  font-family:var(--mono);font-size:10px;padding:2px 9px;
+  border-radius:3px;border:1px solid var(--border2);
+  color:var(--text2);background:var(--bg3);white-space:nowrap;
+}
+.pill.v{border-color:var(--green);color:var(--green)}
+.pill.t{border-color:var(--amber);color:var(--amber)}
+.pill.lang{border-color:var(--blue);color:var(--blue)}
+.topbar-search{
+  background:var(--bg3);border:1px solid var(--border2);
+  color:var(--text);font-family:var(--mono);font-size:12px;
+  padding:5px 12px;border-radius:4px;outline:none;width:200px;
+  transition:.2s;
+}
+.topbar-search:focus{border-color:var(--amber);width:260px}
+.topbar-search::placeholder{color:var(--text2)}
+
+/* ── Layout ── */
+.outer{display:flex;margin-top:52px;min-height:calc(100vh - 52px)}
+
+/* ── Sidebar ── */
+nav{
+  width:var(--sidebar-w);min-width:var(--sidebar-w);
+  background:var(--bg2);border-right:1px solid var(--border);
+  position:fixed;top:52px;bottom:0;left:0;overflow-y:auto;
+  padding:16px 0 40px;
+}
+.nav-group{margin-bottom:4px}
+.nav-group-title{
+  font-family:var(--mono);font-size:9px;font-weight:600;
+  text-transform:uppercase;letter-spacing:1.2px;
+  color:var(--amber);padding:12px 20px 5px;
+}
+nav a{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 20px;font-size:12.5px;color:var(--text2);
+  text-decoration:none;transition:.12s;border-left:2px solid transparent;
+  font-family:var(--sans);
+}
+nav a:hover{color:var(--text);background:var(--bg3);border-left-color:var(--border2)}
+nav a.active{color:var(--amber);background:rgba(240,165,0,.06);border-left-color:var(--amber)}
+nav a .nav-icon{font-size:10px;opacity:.6}
+nav .nav-sub a{padding-left:34px;font-size:11.5px}
+
+/* ── Main content ── */
+main{
+  margin-left:var(--sidebar-w);flex:1;
+  padding:48px 60px 100px;max-width:calc(var(--sidebar-w) + var(--content-max) + 120px);
+}
+
+/* ── Typography ── */
+section{scroll-margin-top:72px;margin-bottom:72px}
+h1{
+  font-size:36px;font-weight:700;letter-spacing:-.5px;
+  color:var(--text);margin-bottom:12px;line-height:1.2;
+}
+h1 .accent{color:var(--amber)}
+h2{
+  font-size:22px;font-weight:600;color:var(--text);
+  margin:52px 0 16px;padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+}
+h3{font-size:16px;font-weight:600;color:var(--amber2);margin:32px 0 10px}
+h4{font-size:13px;font-weight:600;color:var(--text3);margin:20px 0 6px;font-family:var(--mono)}
+p{color:var(--text3);margin-bottom:14px;max-width:740px}
+ul,ol{color:var(--text3);padding-left:22px;margin-bottom:14px;max-width:740px}
+li{margin-bottom:5px;line-height:1.6}
+li strong{color:var(--text)}
+strong{color:var(--text);font-weight:600}
+code{
+  font-family:var(--mono);font-size:12.5px;color:var(--amber2);
+  background:rgba(240,165,0,.08);padding:1px 5px;border-radius:3px;
+  border:1px solid rgba(240,165,0,.15);
+}
+
+/* ── Hero ── */
+.hero{
+  background:linear-gradient(135deg,rgba(240,165,0,.06) 0%,rgba(77,158,247,.04) 100%);
+  border:1px solid var(--border);border-radius:8px;
+  padding:36px 40px;margin-bottom:48px;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:200px;height:200px;
+  background:radial-gradient(circle,rgba(240,165,0,.12),transparent 70%);
+}
+.hero-title{font-size:42px;font-weight:700;color:var(--text);line-height:1.1;margin-bottom:8px}
+.hero-title .mono{font-family:var(--mono);color:var(--amber);font-weight:400}
+.hero-sub{font-size:15px;color:var(--text2);margin-bottom:24px;max-width:600px}
+.hero-badges{display:flex;gap:8px;flex-wrap:wrap}
+.hbadge{
+  font-family:var(--mono);font-size:11px;padding:4px 12px;
+  border-radius:20px;font-weight:500;
+}
+.hb-g{background:rgba(61,230,138,.12);border:1px solid rgba(61,230,138,.3);color:var(--green)}
+.hb-a{background:rgba(240,165,0,.12);border:1px solid rgba(240,165,0,.3);color:var(--amber)}
+.hb-b{background:rgba(77,158,247,.12);border:1px solid rgba(77,158,247,.3);color:var(--blue)}
+.hb-p{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.3);color:var(--purple)}
+
+/* ── Architecture diagram (ASCII art styled) ── */
+.arch-box{
+  font-family:var(--mono);font-size:11.5px;line-height:1.8;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:6px;padding:24px 28px;margin:20px 0;
+  color:var(--text3);overflow-x:auto;white-space:pre;
+}
+.arch-box .hl{color:var(--amber)}
+.arch-box .hl2{color:var(--blue)}
+.arch-box .hl3{color:var(--green)}
+.arch-box .hl4{color:var(--purple)}
+
+/* ── Code blocks ── */
+pre{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:6px;overflow-x:auto;margin:16px 0;
+  position:relative;
+}
+pre .code-label{
+  position:absolute;top:0;right:0;
+  font-family:var(--mono);font-size:9px;font-weight:600;
+  color:var(--text2);background:var(--bg3);
+  padding:3px 10px;border-left:1px solid var(--border);
+  border-bottom:1px solid var(--border);border-radius:0 6px 0 4px;
+  text-transform:uppercase;letter-spacing:.5px;
+}
+pre code{
+  display:block;padding:20px 22px;
+  font-size:12.5px;line-height:1.7;color:var(--text3);
+  background:none;border:none;padding-top:28px;
+}
+/* Syntax highlight classes */
+.kw{color:#f472b6}   /* keywords */
+.ty{color:var(--cyan)}   /* types */
+.fn{color:var(--blue)}   /* functions */
+.st{color:var(--green)}  /* strings */
+.cm{color:#4a5568}       /* comments */
+.nm{color:var(--amber2)} /* numbers/consts */
+.op{color:var(--text2)}  /* operators */
+
+/* ── Info boxes ── */
+.box{
+  border-radius:6px;padding:16px 18px;margin:20px 0;
+  border-left:3px solid;font-size:13.5px;line-height:1.6;
+  max-width:740px;
+}
+.box p{margin:0;color:inherit}
+.box-note{background:rgba(77,158,247,.06);border-color:var(--blue);color:var(--text3)}
+.box-warn{background:rgba(240,80,80,.06);border-color:var(--red);color:var(--text3)}
+.box-tip{background:rgba(61,230,138,.06);border-color:var(--green);color:var(--text3)}
+.box-title{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.box-note .box-title{color:var(--blue)}
+.box-warn .box-title{color:var(--red)}
+.box-tip  .box-title{color:var(--green)}
+
+/* ── Tables ── */
+.table-wrap{overflow-x:auto;margin:20px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{
+  background:var(--bg3);font-family:var(--mono);font-size:10px;
+  text-transform:uppercase;letter-spacing:.6px;color:var(--amber);
+  padding:10px 14px;text-align:left;border-bottom:2px solid var(--border2);
+}
+td{
+  padding:9px 14px;border-bottom:1px solid var(--border);
+  color:var(--text3);vertical-align:top;
+}
+td code{font-size:11.5px}
+tr:hover td{background:rgba(255,255,255,.02)}
+td:first-child{color:var(--text);font-family:var(--mono);font-size:12px}
+
+/* ── API function cards ── */
+.api-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:6px;margin-bottom:20px;overflow:hidden;
+}
+.api-card-head{
+  background:var(--bg3);padding:12px 18px;
+  border-bottom:1px solid var(--border);
+  font-family:var(--mono);font-size:12px;line-height:1.5;
+}
+.api-card-head .ret{color:var(--cyan)}
+.api-card-head .fname{color:var(--amber2);font-weight:600}
+.api-card-head .param{color:var(--text3)}
+.api-card-head .ptype{color:var(--purple)}
+.api-card-body{padding:14px 18px}
+.api-card-body p{font-size:13px;margin-bottom:8px}
+.api-params{margin-top:10px}
+.api-param-row{
+  display:grid;grid-template-columns:140px 1fr;gap:8px;
+  font-size:12.5px;padding:5px 0;border-bottom:1px solid var(--border);
+}
+.api-param-row:last-child{border:none}
+.api-param-name{font-family:var(--mono);color:var(--amber2)}
+.api-param-desc{color:var(--text2)}
+.api-returns{margin-top:10px;font-size:12.5px;color:var(--text2)}
+.api-returns strong{color:var(--green)}
+
+/* ── File tree ── */
+.filetree{
+  font-family:var(--mono);font-size:12px;line-height:2;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:6px;padding:18px 22px;margin:16px 0;
+  color:var(--text3);
+}
+.filetree .dir{color:var(--blue)}
+.filetree .hdr{color:var(--cyan)}
+.filetree .src{color:var(--text3)}
+.filetree .html{color:var(--amber)}
+.filetree .mk{color:var(--green)}
+.filetree .py{color:var(--purple)}
+.filetree .cmt{color:#4a5568}
+
+/* ── Pipeline steps ── */
+.pipeline{display:flex;flex-direction:column;gap:0;margin:24px 0}
+.pipe-step{
+  display:flex;align-items:flex-start;gap:16px;
+  padding:16px 20px;background:var(--bg2);
+  border:1px solid var(--border);margin-bottom:-1px;
+}
+.pipe-step:first-child{border-radius:6px 6px 0 0}
+.pipe-step:last-child{border-radius:0 0 6px 6px;margin-bottom:0}
+.pipe-num{
+  font-family:var(--mono);font-size:11px;font-weight:600;
+  color:var(--bg);background:var(--amber);
+  width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  margin-top:2px;
+}
+.pipe-content h4{margin:0 0 4px;font-size:13px;color:var(--text)}
+.pipe-content p{font-size:12.5px;color:var(--text2);margin:0;max-width:none}
+
+/* ── Enhancement cards ── */
+.enh-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}
+.enh-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:6px;padding:18px;transition:.15s;
+}
+.enh-card:hover{border-color:var(--border2);background:var(--bg3)}
+.enh-card-icon{font-size:22px;margin-bottom:8px}
+.enh-card h4{font-size:13px;color:var(--text);margin:0 0 5px;font-family:var(--sans)}
+.enh-card p{font-size:12px;color:var(--text2);margin:0}
+.enh-card .diff{
+  font-family:var(--mono);font-size:9px;margin-top:8px;
+  padding:2px 7px;border-radius:3px;display:inline-block;
+}
+.diff-easy{background:rgba(61,230,138,.1);color:var(--green);border:1px solid rgba(61,230,138,.2)}
+.diff-med {background:rgba(240,165,0,.1);color:var(--amber);border:1px solid rgba(240,165,0,.2)}
+.diff-hard{background:rgba(240,80,80,.1);color:var(--red);border:1px solid rgba(240,80,80,.2)}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:-1px}
+.tab{
+  font-family:var(--mono);font-size:11px;padding:8px 16px;
+  cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;
+  transition:.12s;user-select:none;
+}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--amber);border-bottom-color:var(--amber)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* ── Comparison ── */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:20px 0}
+.compare-col{background:var(--bg2);border:1px solid var(--border);padding:16px 18px}
+.compare-col:first-child{border-radius:6px 0 0 6px;border-right:none}
+.compare-col:last-child{border-radius:0 6px 6px 0}
+.compare-title{
+  font-family:var(--mono);font-size:10px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;
+}
+.compare-title.old{color:var(--red)}
+.compare-title.new{color:var(--green)}
+
+/* ── Quick reference card ── */
+.qref{
+  background:var(--bg2);border:1px solid var(--amber);border-radius:6px;
+  padding:22px 26px;margin:20px 0;
+}
+.qref h3{color:var(--amber);margin:0 0 14px;font-size:14px}
+.qref-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.qref-item{
+  font-family:var(--mono);font-size:11px;padding:5px 8px;
+  background:var(--bg3);border-radius:3px;color:var(--text3);
+}
+.qref-item span{color:var(--amber2)}
+
+/* ── Breadcrumb ── */
+.breadcrumb{
+  font-family:var(--mono);font-size:11px;color:var(--text2);
+  margin-bottom:24px;display:flex;align-items:center;gap:6px;
+}
+.breadcrumb a{color:var(--amber);text-decoration:none}
+
+/* ── TOC ── */
+.toc{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:6px;padding:20px 24px;margin-bottom:40px;
+}
+.toc h3{font-size:11px;font-family:var(--mono);color:var(--amber);
+  text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+.toc ol{padding-left:18px;column-count:2;column-gap:24px}
+.toc li{font-size:12.5px;margin-bottom:4px}
+.toc a{color:var(--text2);text-decoration:none;transition:.12s}
+.toc a:hover{color:var(--amber)}
+
+/* ── Responsive ── */
+@media(max-width:900px){
+  nav{display:none}
+  main{margin-left:0;padding:24px 20px 60px}
+  .enh-grid{grid-template-columns:1fr}
+  .compare{grid-template-columns:1fr}
+  .compare-col:first-child{border-radius:6px 6px 0 0;border-right:1px solid var(--border);border-bottom:none}
+  .compare-col:last-child{border-radius:0 0 6px 6px}
+  .qref-grid{grid-template-columns:1fr}
+}
+
+/* ── Animations ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+section{animation:fadeIn .4s ease both}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ TOP BAR ═══════════════ -->
+<div class="topbar">
+  <div class="topbar-logo">⬡ SRHN <span>v3</span></div>
+  <div class="pill v">69/69 tests</div>
+  <div class="pill t">~8,500 LOC</div>
+  <div class="pill lang">C11</div>
+  <div class="pill" style="border-color:var(--purple);color:var(--purple)">No deps</div>
+  <input class="topbar-search" placeholder="Search docs… (coming soon)" readonly>
+  <div class="topbar-pills">
+    <a href="#quickstart" class="pill" style="cursor:pointer;text-decoration:none">Quick Start</a>
+    <a href="#api-reference" class="pill" style="cursor:pointer;text-decoration:none">API Ref</a>
+    <a href="#enhancements" class="pill" style="cursor:pointer;text-decoration:none">Enhance</a>
+  </div>
+</div>
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<div class="outer">
+<nav id="sidebar">
+  <div class="nav-group">
+    <div class="nav-group-title">Getting Started</div>
+    <a href="#overview" class="active"><span class="nav-icon">◎</span>Overview</a>
+    <a href="#quickstart"><span class="nav-icon">⚡</span>Quick Start</a>
+    <a href="#codespace"><span class="nav-icon">☁</span>Codespace Deploy</a>
+    <a href="#project-structure"><span class="nav-icon">📁</span>Project Structure</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Architecture</div>
+    <a href="#arch-overview"><span class="nav-icon">⬡</span>System Overview</a>
+    <a href="#query-pipeline"><span class="nav-icon">⟶</span>19-Step Pipeline</a>
+    <a href="#data-model"><span class="nav-icon">◈</span>Data Model</a>
+    <a href="#modules"><span class="nav-icon">⊞</span>Module Guide</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">API Reference</div>
+    <a href="#api-core"><span class="nav-icon">◉</span>Core Network</a>
+    <a href="#api-embed"><span class="nav-icon">∿</span>Embeddings</a>
+    <a href="#api-hnsw"><span class="nav-icon">⊙</span>HNSW Index</a>
+    <a href="#api-reasoning"><span class="nav-icon">⛓</span>Reasoning</a>
+    <a href="#api-memory"><span class="nav-icon">◫</span>Memory</a>
+    <a href="#api-llm"><span class="nav-icon">◈</span>LLM Bridge</a>
+    <a href="#api-persist"><span class="nav-icon">💾</span>Persistence</a>
+    <a href="#api-rest"><span class="nav-icon">⟳</span>REST API</a>
+    <a href="#api-training"><span class="nav-icon">▲</span>Training</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Configuration</div>
+    <a href="#constants"><span class="nav-icon">⚙</span>Tunable Constants</a>
+    <a href="#enums"><span class="nav-icon">≡</span>Enums & Types</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Developer Guide</div>
+    <a href="#enhancements"><span class="nav-icon">✦</span>Enhancement Paths</a>
+    <a href="#adding-domain"><span class="nav-icon">+</span>Adding a Domain</a>
+    <a href="#custom-embeddings"><span class="nav-icon">∿</span>Custom Embeddings</a>
+    <a href="#llm-integration"><span class="nav-icon">◈</span>LLM Integration</a>
+    <a href="#testing"><span class="nav-icon">✓</span>Testing Guide</a>
+    <a href="#performance"><span class="nav-icon">◈</span>Performance</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Deployment</div>
+    <a href="#rest-deploy"><span class="nav-icon">⟳</span>REST Server</a>
+    <a href="#python-client"><span class="nav-icon">🐍</span>Python Client</a>
+    <a href="#visualizer"><span class="nav-icon">⬡</span>Visualizer</a>
+    <a href="#real-world"><span class="nav-icon">◎</span>Real-World Patterns</a>
+  </div>
+  <div class="nav-group">
+    <div class="nav-group-title">Reference</div>
+    <a href="#changelog"><span class="nav-icon">⟴</span>v2 → v3 Changes</a>
+    <a href="#bugs-fixed"><span class="nav-icon">✓</span>Bugs Fixed</a>
+    <a href="#glossary"><span class="nav-icon">≣</span>Glossary</a>
+  </div>
+</nav>
+
+<!-- ═══════════════ MAIN CONTENT ═══════════════ -->
+<main>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-title">SRHN <span class="mono">v3</span></div>
+  <div class="hero-sub">Semantic Resonance Hypergraph Network — a structured reasoning layer that wraps local LLMs with an explainable, learning knowledge graph. Zero cloud dependencies. Single C library.</div>
+  <div class="hero-badges">
+    <span class="hbadge hb-g">88/88 Tests Passing</span>
+    <span class="hbadge hb-a">7,033 Lines of C11</span>
+    <span class="hbadge hb-b">HNSW O(log n) Search</span>
+    <span class="hbadge hb-p">15 Languages</span>
+    <span class="hbadge hb-g">No External Dependencies</span>
+    <span class="hbadge hb-b">REST API Included</span>
+  </div>
+
+    <div class="hero-badges" style="margin-top:10px">
+      <span class="hbadge hb-g">R1: Multi-Semantic Views</span>
+      <span class="hbadge hb-b">R2: Distributional MsgPass</span>
+      <span class="hbadge hb-a">R3: Hyperedge Attention</span>
+      <span class="hbadge hb-p">R4: Autoencoder Filter</span>
+      <span class="hbadge hb-g">R5: Temporal Decay</span>
+      <span class="hbadge hb-b">R6: Hypergraph VAE</span>
+      <span class="hbadge hb-a">R7: PAC-Bayes Bounds</span>
+      <span class="hbadge hb-p">R8: Spectral Seeds</span>
+    </div>
+</div>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#overview">Overview & Philosophy</a></li>
+    <li><a href="#quickstart">Quick Start (3 min)</a></li>
+    <li><a href="#codespace">Codespace Deploy</a></li>
+    <li><a href="#arch-overview">Architecture</a></li>
+    <li><a href="#query-pipeline">19-Step Pipeline</a></li>
+    <li><a href="#data-model">Data Model</a></li>
+    <li><a href="#api-core">Core API Reference</a></li>
+    <li><a href="#api-rest">REST Endpoints</a></li>
+    <li><a href="#constants">Tunable Constants</a></li>
+    <li><a href="#enhancements">Enhancement Paths</a></li>
+    <li><a href="#adding-domain">Adding a Domain</a></li>
+    <li><a href="#llm-integration">LLM Integration</a></li>
+    <li><a href="#testing">Testing Guide</a></li>
+    <li><a href="#real-world">Real-World Patterns</a></li>
+    <li><a href="#changelog">v2 → v3 Migration</a></li>
+    <li><a href="#glossary">Glossary</a></li>
+  </ol>
+</div>
+
+<!-- ═══════════ SECTION 1: OVERVIEW ═══════════ -->
+<section id="overview">
+  <h1>Overview <span class="accent">&amp; Philosophy</span></h1>
+
+  <p>SRHN v4 is <strong>not a language model</strong>. It is a graph-based associative memory engine that acts as a <strong>structured reasoning layer</strong> sitting between your application and any local LLM. The graph retrieves relevant knowledge, builds causal chains, detects contradictions, and hands a rich structured context to the LLM — which only needs to handle fluent text generation.</p>
+
+  <p>This separation gives you three things no pure LLM approach can: <strong>explainability</strong> (the chain of activated nodes is fully auditable), <strong>learning</strong> (Hebbian weight updates, PageRank, episodic memory), and <strong>offline operation</strong> (the entire system is a 400KB C binary with no Python, no Docker, no GPU required).</p>
+
+  <h2>Core Concepts</h2>
+
+  <div class="pipeline">
+    <div class="pipe-step">
+      <div class="pipe-num">1</div>
+      <div class="pipe-content">
+        <h4>Nodes are concepts, not tokens</h4>
+        <p>Each node stores a 384-dim embedding, activation state, PageRank importance, entropy score, and typed connections. Nodes can be Physics laws (with formulas), Code patterns, Emotions, or generic Concepts.</p>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">2</div>
+      <div class="pipe-content">
+        <h4>Queries propagate activation, not attention</h4>
+        <p>A query is embedded, seeds the HNSW index to find similar nodes, then BFS-propagates activation through the graph with spike decay. The activated subgraph is the "context".</p>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">3</div>
+      <div class="pipe-content">
+        <h4>The LLM generates, the graph grounds</h4>
+        <p>SRHN builds a structured context string from the activated nodes, chains, and contradictions — then calls the LLM. After generation, it verifies the response against the graph and flags hallucinations.</p>
+      </div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-num">4</div>
+      <div class="pipe-content">
+        <h4>Every query teaches the graph</h4>
+        <p>Feedback signals trigger Hebbian weight updates, contrastive signature learning, and episodic storage. PageRank runs every 100 queries to update node importance. The graph improves over time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 2: QUICK START ═══════════ -->
+<section id="quickstart">
+  <h1>Quick <span class="accent">Start</span></h1>
+
+  <h3>Prerequisites</h3>
+  <ul>
+    <li>GCC ≥ 11 or Clang ≥ 13 with C11 support</li>
+    <li>POSIX-compliant OS (Linux, macOS, WSL2)</li>
+    <li>Make</li>
+    <li>pthreads + libm + libdl (standard on all Linux distros)</li>
+  </ul>
+
+  <pre><code class="code-label">bash — install deps</code><code><span class="cm"># Ubuntu / Debian / Codespace</span>
+sudo apt-get install -y build-essential gcc make
+
+<span class="cm"># macOS (Xcode CLT already provides everything)</span>
+xcode-select --install</code></pre>
+
+  <h3>Build</h3>
+  <pre><code class="code-label">bash</code><code><span class="cm"># Clone or unzip into srhn_v4/</span>
+cd srhn_v4
+
+<span class="fn">make</span> all        <span class="cm"># → build/libsrhn3.a  build/srhn4_train  build/srhn_test</span>
+<span class="fn">make</span> test        <span class="cm"># → 69/69 tests pass</span>
+<span class="fn">make</span> release     <span class="cm"># → O3 + LTO optimised build</span>
+<span class="fn">make</span> debug       <span class="cm"># → AddressSanitizer + UBSan</span></code></pre>
+
+  <h3>Hello World (C)</h3>
+  <pre><code class="code-label">c</code><code><span class="cm">// hello_srhn.c</span>
+<span class="kw">#include</span> <span class="st">"srhn_v4.h"</span>
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>) {
+    <span class="cm">/* 1. Create the network */</span>
+    <span class="ty">SRHNNetwork4</span> *net = <span class="fn">srhn4_create</span>();
+
+    <span class="cm">/* 2. Load built-in knowledge bases */</span>
+    <span class="fn">srhn4_load_physics</span>(net);
+    <span class="fn">srhn4_load_code</span>(net);
+
+    <span class="cm">/* 3. Query */</span>
+    <span class="ty">SRHNResult4</span> r = <span class="fn">srhn4_query</span>(net, <span class="st">"what is Newton second law"</span>);
+    printf(<span class="st">"Response:   %s\n"</span>, r.response);
+    printf(<span class="st">"Confidence: %.1f%%\n"</span>, r.confidence * <span class="nm">100.f</span>);
+    printf(<span class="st">"Chains:     %u\n"</span>, r.n_chains);
+
+    <span class="cm">/* 4. Show reasoning chain */</span>
+    <span class="kw">for</span> (<span class="ty">int</span> i = <span class="nm">0</span>; i &lt; r.n_chains; i++) {
+        <span class="ty">ReasoningChain</span> *c = &amp;r.chains[i];
+        printf(<span class="st">"  Chain %d: "</span>, i+<span class="nm">1</span>);
+        <span class="kw">for</span> (<span class="ty">int</span> j = <span class="nm">0</span>; j &lt; c-&gt;length; j++) {
+            <span class="kw">if</span> (j) printf(<span class="st">" → "</span>);
+            printf(<span class="st">"%s"</span>, c-&gt;labels[j]);
+        }
+        printf(<span class="st">"\n"</span>);
+    }
+
+    <span class="cm">/* 5. Feedback */</span>
+    <span class="fn">srhn4_feedback</span>(net, net-&gt;query_counter, <span class="nm">0.9f</span>);
+
+    <span class="fn">srhn4_save</span>(net, <span class="st">"/tmp/my_net.bin"</span>);
+    <span class="fn">srhn4_destroy</span>(net);
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</code></pre>
+
+  <pre><code class="code-label">bash — compile &amp; run</code><code>gcc -std=c11 -O2 -I./include hello_srhn.c build/libsrhn3.a -lpthread -lm -ldl -o hello
+./hello</code></pre>
+
+  <h3>Trainer CLI</h3>
+  <pre><code class="code-label">bash</code><code><span class="cm"># Batch: train 10 epochs + benchmark + export</span>
+./build/srhn4_train --epochs 10
+
+<span class="cm"># Interactive REPL</span>
+./build/srhn4_train --interactive
+
+<span class="cm"># Start REST API after training</span>
+./build/srhn4_train --serve --port 8765
+
+<span class="cm"># With llama.cpp LLM (optional)</span>
+SRHN_LLAMA_SO=./libllama.so \
+  ./build/srhn4_train --llm model.gguf --interactive</code></pre>
+</section>
+
+<!-- ═══════════ SECTION 3: CODESPACE ═══════════ -->
+<section id="codespace">
+  <h1>Codespace <span class="accent">Deploy</span></h1>
+
+  <h3>Option A — One-button (with .devcontainer)</h3>
+  <p>The repo ships with <code>.devcontainer/devcontainer.json</code>. Push to GitHub and click <strong>Code → Open with Codespaces</strong>. The container builds automatically, forwards ports 8765 (API) and 3000 (visualizer HTTP).</p>
+
+  <h3>Option B — Manual in any Codespace</h3>
+  <pre><code class="code-label">bash — step by step</code><code><span class="cm"># 1. Dependencies (already present in default Ubuntu Codespace)</span>
+sudo apt-get install -y build-essential
+
+<span class="cm"># 2. Build</span>
+cd srhn_v4 &amp;&amp; make all
+
+<span class="cm"># 3. Verify everything works</span>
+chmod +x scripts/verify.sh &amp;&amp; ./scripts/verify.sh
+
+<span class="cm"># 4. Train (produces /tmp/srhn4_state.json for visualizer)</span>
+./build/srhn4_train --epochs 10
+
+<span class="cm"># 5. Start REST API (background)</span>
+./build/srhn4_train --serve --port 8765 &amp;
+
+<span class="cm"># 6. Serve the visualizer</span>
+python3 -m http.server 3000 &amp;
+
+<span class="cm"># 7. Test the API</span>
+curl -s -X POST http://localhost:8765/query \
+  -H 'Content-Type: application/json' \
+  -d '{"q":"what is Newton second law"}' | python3 -m json.tool</code></pre>
+
+  <div class="box box-tip">
+    <div class="box-title">Tip — Visualizer</div>
+    <p>Open <code>https://&lt;codespace-name&gt;-3000.app.github.dev/srhn_v4_visualizer.html</code>, click <strong>📂 Load JSON</strong>, pick <code>/tmp/srhn4_state.json</code>. Then click <strong>⚡ API</strong> to connect live to the running server.</p>
+  </div>
+
+  <h3>Port Forwarding in Codespace</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Port</th><th>Service</th><th>URL Pattern</th></tr>
+    <tr><td>8765</td><td>SRHN REST API</td><td><code>https://&lt;cs&gt;-8765.app.github.dev</code></td></tr>
+    <tr><td>3000</td><td>Static file server (visualizer)</td><td><code>https://&lt;cs&gt;-3000.app.github.dev</code></td></tr>
+  </table></div>
+
+  <div class="box box-warn">
+    <div class="box-title">Codespace CORS Note</div>
+    <p>When running in Codespace, the API server's <code>Access-Control-Allow-Origin: *</code> header is already set. If you access the API from the visualizer on a different port, open the API URL once in your browser to accept the Codespace auth redirect.</p>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 4: PROJECT STRUCTURE ═══════════ -->
+<section id="project-structure">
+  <h1>Project <span class="accent">Structure</span></h1>
+  <div class="filetree">srhn_v4/
+├── <span class="dir">include/</span>
+│   ├── <span class="hdr">srhn_v4.h</span>            <span class="cmt">← All types, structs, 60+ forward decls</span>
+│   └── <span class="hdr">srhn_v4_train.h</span>      <span class="cmt">← Training pipeline types + API</span>
+│
+├── <span class="dir">src/</span>
+│   ├── <span class="src">srhn_core.c</span>          <span class="cmt">← Network lifecycle, 19-step query pipeline</span>
+│   ├── <span class="src">srhn_embed.c</span>         <span class="cmt">← GloVe/FastText/n-gram embeddings (384-dim)</span>
+│   ├── <span class="src">srhn_tokenizer.c</span>     <span class="cmt">← BPE tokenizer (GPT-2 vocab compatible)</span>
+│   ├── <span class="src">srhn_hnsw.c</span>          <span class="cmt">← HNSW ANN index, O(log n) search</span>
+│   ├── <span class="src">srhn_reasoning.c</span>     <span class="cmt">← Chains, causal A*, contradiction detection</span>
+│   ├── <span class="src">srhn_llm.c</span>           <span class="cmt">← llama.cpp bridge, context builder, grounding</span>
+│   ├── <span class="src">srhn_feedback.c</span>      <span class="cmt">← Hebbian, PageRank, calibration</span>
+│   ├── <span class="src">srhn_memory.c</span>        <span class="cmt">← Episodic + working memory, context blend</span>
+│   ├── <span class="src">srhn_persist.c</span>       <span class="cmt">← WAL, binary snapshot, JSON export</span>
+│   ├── <span class="src">srhn_utils.c</span>         <span class="cmt">← Lang detect, selfgrow, physics/code KB</span>
+│   ├── <span class="src">srhn_api.c</span>           <span class="cmt">← Zero-dep REST server (POSIX sockets)</span>
+│   ├── <span class="src">srhn_v4_train.c</span>      <span class="cmt">← Training: 120+ samples, 8 domains</span>
+│   └── <span class="src">srhn_v4_train_main.c</span> <span class="cmt">← Training CLI REPL</span>
+│
+├── <span class="dir">tests/</span>
+│   └── <span class="src">srhn_test.c</span>          <span class="cmt">← 88-test suite (T01–T22)</span>
+│
+├── <span class="html">srhn_v4_visualizer.html</span> <span class="cmt">← Single-file graph visualizer</span>
+├── <span class="py">srhn_client.py</span>          <span class="cmt">← Python REST client</span>
+├── <span class="dir">scripts/</span>
+│   └── <span class="mk">verify.sh</span>            <span class="cmt">← Full system verification script</span>
+├── <span class="dir">.devcontainer/</span>
+│   └── <span class="mk">devcontainer.json</span>    <span class="cmt">← Codespace config</span>
+├── <span class="mk">Makefile</span>
+└── <span class="mk">README.md</span></div>
+</section>
+
+<!-- ═══════════ SECTION 5: ARCHITECTURE ═══════════ -->
+<section id="arch-overview">
+  <h1>Architecture <span class="accent">Overview</span></h1>
+
+  <div class="arch-box"><span class="hl">┌─────────────────────────────────────────────────────────────────┐</span>
+<span class="hl">│                  Application / REST Client                      │</span>
+<span class="hl">│         POST /query  POST /feedback  POST /ingest               │</span>
+<span class="hl">└──────────────────────────┬──────────────────────────────────────┘</span>
+                           │
+<span class="hl2">┌──────────────────────────▼──────────────────────────────────────┐</span>
+<span class="hl2">│                    srhn_api.c  (REST Server)                    │</span>
+<span class="hl2">│     Zero-dep POSIX sockets · thread-per-connection · CORS       │</span>
+<span class="hl2">└──────────────────────────┬──────────────────────────────────────┘</span>
+                           │
+<span class="hl">┌──────────────────────────▼──────────────────────────────────────┐</span>
+<span class="hl">│                    srhn_core.c  (Query Pipeline)                │</span>
+<span class="hl">│  1.lang detect  2.abbrev expand  3.embed  4.ctx blend           │</span>
+<span class="hl">│  5.decay        6.wm decay       7.HNSW seed  8.propagate       │</span>
+<span class="hl">│  9.hyperedge   10.chains        11.contradictions 12.concepts   │</span>
+<span class="hl">│ 13.calibrate   14.selfgrow      15.LLM  16.ctx upd 17.episodic  │</span>
+<span class="hl">│ 18.maintenance 19.metrics                                       │</span>
+<span class="hl">└─────┬────────────┬──────────────┬────────────┬──────────────────┘</span>
+      │            │              │            │
+<span class="hl2">┌─────▼──────┐ ┌──▼─────────┐ ┌──▼────────┐ ┌▼─────────────────┐</span>
+<span class="hl2">│ srhn_embed │ │ srhn_hnsw  │ │srhn_reason│ │   srhn_llm       │</span>
+<span class="hl2">│ GloVe/Fast │ │ O(log n)   │ │ BFS·chains│ │ llama.cpp bridge │</span>
+<span class="hl2">│ Text/ngram │ │ ANN index  │ │ causal A* │ │ ctx builder      │</span>
+<span class="hl2">│ 384-dim    │ │ HNSW M=16  │ │ contradict│ │ grounding check  │</span>
+<span class="hl2">└────────────┘ └────────────┘ └───────────┘ └──────────────────┘</span>
+      │                                              │
+<span class="hl3">┌─────▼──────────────────────────────────────────────▼────────────┐</span>
+<span class="hl3">│                    srhn_feedback.c                              │</span>
+<span class="hl3">│  Hebbian weights · Contrastive sigs · PageRank · Calibration    │</span>
+<span class="hl3">└──────────────────────────┬──────────────────────────────────────┘</span>
+                           │
+<span class="hl4">┌──────────────────────────▼──────────────────────────────────────┐</span>
+<span class="hl4">│                    srhn_memory.c                                │</span>
+<span class="hl4">│  Working mem (16 slots) · Episodic (10K) · Context blending     │</span>
+<span class="hl4">└──────────────────────────┬──────────────────────────────────────┘</span>
+                           │
+<span class="hl">┌──────────────────────────▼──────────────────────────────────────┐</span>
+<span class="hl">│                    srhn_persist.c                               │</span>
+<span class="hl">│     WAL (CRC32) · Binary snapshot · JSON export                 │</span>
+<span class="hl">└─────────────────────────────────────────────────────────────────┘</span></div>
+</section>
+
+<!-- ═══════════ SECTION 6: QUERY PIPELINE ═══════════ -->
+<section id="query-pipeline">
+  <h1>The 19-Step <span class="accent">Query Pipeline</span></h1>
+  <p>Every call to <code>srhn4_query(net, input)</code> runs exactly these steps in order. Understanding this pipeline is the key to extending SRHN.</p>
+
+  <div class="pipeline">
+    <div class="pipe-step"><div class="pipe-num">1</div><div class="pipe-content"><h4>Language Detection</h4><p>Script-range byte scanning (CJK, Devanagari, Arabic, Cyrillic) + stopword matching for 15 European languages + code keyword detection. Sets <code>result.response_lang</code>.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">2</div><div class="pipe-content"><h4>Abbreviation Expansion</h4><p>Tokenise the query, look up each token in the lexicon's <code>abbrevs[]</code> array, rebuild the expanded string. Enables "ML" → "machine learning".</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">3</div><div class="pipe-content"><h4>Query Embedding</h4><p>Call <code>srhn4_embed_text()</code> on the expanded query. Returns a unit-normalised 384-dim signature. Falls back to n-gram hashing if no GloVe/FastText loaded.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">4</div><div class="pipe-content"><h4>Cross-Turn Context Blending</h4><p>Blend current query sig with the last 4 turns using exponential weights (0.25, 0.125, 0.0625, 0.03125). This is what makes "what's the formula?" work after "tell me about Newton's law".</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">5</div><div class="pipe-content"><h4>Activation Decay</h4><p>Multiply all node activations by 0.20 before new propagation. Nodes that haven't fired recently return to near-zero. This prevents stale activations polluting the new query.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">6</div><div class="pipe-content"><h4>Working Memory Decay</h4><p>Decay slot salience by 20% per query. Slots below 0.05 are evicted. This simulates short-term forgetting while keeping recently salient nodes primed.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">7</div><div class="pipe-content"><h4>HNSW Seed Search</h4><p>Search the HNSW index with the blended signature. Returns up to 16 seed nodes in O(log n). Falls back to linear scan if HNSW has no results.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">8</div><div class="pipe-content"><h4>BFS Propagation</h4><p>For each seed node, run heap-allocated BFS with spike decay (0.72). Working memory nodes get 10× activation bonus. Inhibitory edges reduce spike strength. Terminates at MAX_HOPS=12 or MAX_ACTIVATED=1024.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">9</div><div class="pipe-content"><h4>Hyperedge Evaluation</h4><p>Scan all hyperedges. Causal edges fire only if all member nodes are active. Associative edges fire on average activation. Fired edges are recorded in <code>result.fired_edges[]</code>.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">10</div><div class="pipe-content"><h4>Reasoning Chain Building</h4><p>Find top-8 activated nodes by activation strength, then find all direct and 2-hop connections between them. Build up to MAX_CHAINS=8 labeled chains.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">11</div><div class="pipe-content"><h4>Contradiction Detection</h4><p>Scan all pairs of activated nodes (&gt;0.25 activation) for EDGE_CONTRADICTS connections. Populate <code>result.contradictions[]</code>.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">12</div><div class="pipe-content"><h4>Top Concept Extraction</h4><p>Partial-sort activated nodes by activation value, store top 8 labels in <code>result.top_concepts[]</code>.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">13</div><div class="pipe-content"><h4>Confidence Calibration</h4><p>Compute raw confidence from resonance + activation + chain count, then run through the isotonic calibration table to produce a real probability.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">14</div><div class="pipe-content"><h4>Self-Grow</h4><p>If best_resonance &lt; selfgrow_thresh (0.18), tokenise the query, filter stopwords, and call <code>srhn4_selfgrow()</code> for each novel token. New nodes connect to nearest HNSW neighbours.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">15</div><div class="pipe-content"><h4>LLM Answer (serialised)</h4><p>Build structured context → select prompt template by dominant node type → call <code>srhn4_llm_generate()</code> → run grounding check → extract new concepts from response.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">16</div><div class="pipe-content"><h4>Context Update</h4><p>Store query + result in <code>ConvContext.turns[]</code>. Update rolling session signature. Insert top activated nodes into working memory.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">17</div><div class="pipe-content"><h4>Episodic Storage</h4><p>Store episode with key nodes and confidence in the 10K circular episodic buffer. Reward field filled in by <code>srhn4_feedback()</code> if called later.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">18</div><div class="pipe-content"><h4>Periodic Maintenance</h4><p>Every 25 queries: <code>srhn4_prune_pass()</code>. Every 100 queries: <code>srhn4_run_pagerank()</code>.</p></div></div>
+    <div class="pipe-step"><div class="pipe-num">19</div><div class="pipe-content"><h4>Metrics</h4><p>Record latency, compute_used (activated/total), hops_taken. Update rolling average latency. Increment LLM call counter.</p></div></div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 7: DATA MODEL ═══════════ -->
+<section id="data-model">
+  <h1>Data <span class="accent">Model</span></h1>
+
+  <h2>Node Types</h2>
+  <div class="table-wrap"><table>
+    <tr><th>Enum</th><th>Value</th><th>Use Case</th><th>Special Fields</th></tr>
+    <tr><td>NODE_CONCEPT</td><td>0</td><td>General knowledge, ideas, entities</td><td>—</td></tr>
+    <tr><td>NODE_ENTITY</td><td>1</td><td>Named entities (people, places)</td><td>—</td></tr>
+    <tr><td>NODE_EVENT</td><td>2</td><td>Time-bound occurrences</td><td>—</td></tr>
+    <tr><td>NODE_RELATION</td><td>3</td><td>Relationship nodes (n-ary edges)</td><td>—</td></tr>
+    <tr><td>NODE_PHYSICS</td><td>4</td><td>Physics laws and equations</td><td><code>formula</code>, <code>units</code></td></tr>
+    <tr><td>NODE_CODE</td><td>5</td><td>Programming concepts and patterns</td><td><code>code_lang</code>, <code>code_pattern</code></td></tr>
+    <tr><td>NODE_VISION</td><td>6</td><td>Visual concepts and objects</td><td><code>visual_hash[32]</code></td></tr>
+    <tr><td>NODE_EMOTION</td><td>7</td><td>Emotional states and psychological concepts</td><td><code>sentiment</code></td></tr>
+    <tr><td>NODE_PROCEDURE</td><td>8</td><td>Step-by-step processes</td><td>—</td></tr>
+    <tr><td>NODE_PRUNED</td><td>9</td><td>Tombstone (evicted node)</td><td>—</td></tr>
+  </table></div>
+
+  <h2>Edge Types</h2>
+  <div class="table-wrap"><table>
+    <tr><th>Enum</th><th>Value</th><th>Semantic</th><th>Visual (visualizer)</th></tr>
+    <tr><td>EDGE_ASSOC</td><td>0</td><td>General association</td><td>Blue, thin</td></tr>
+    <tr><td>EDGE_CAUSAL</td><td>1</td><td>A causally requires/implies B</td><td>Amber, arrow</td></tr>
+    <tr><td>EDGE_SYNONYM</td><td>2</td><td>Same meaning</td><td>Light blue</td></tr>
+    <tr><td>EDGE_ANTONYM</td><td>3</td><td>Opposite meaning</td><td>Red, faint</td></tr>
+    <tr><td>EDGE_CAUSES</td><td>6</td><td>A physically/logically causes B</td><td>Amber, bold arrow</td></tr>
+    <tr><td>EDGE_INHIBITORY</td><td>7</td><td>A suppresses B's activation</td><td>Red, faint</td></tr>
+    <tr><td>EDGE_CODE</td><td>10</td><td>Code relationship (is-a, uses)</td><td>Cyan</td></tr>
+    <tr><td>EDGE_CONTRADICTS</td><td>12</td><td>A contradicts B — triggers warning</td><td>Red dashed, bright</td></tr>
+    <tr><td>EDGE_SUPPORTS</td><td>13</td><td>A supports/evidences B</td><td>Green</td></tr>
+  </table></div>
+
+  <h2>Key Struct Fields</h2>
+  <pre><code class="code-label">c — SRHNNode3 important fields</code><code><span class="ty">typedef struct</span> {
+    <span class="ty">uint32_t</span>  id;                     <span class="cm">// unique index</span>
+    <span class="ty">NodeType</span>  type;                   <span class="cm">// NODE_CONCEPT … NODE_PRUNED</span>
+    <span class="ty">LangID</span>    lang;                   <span class="cm">// language of the label</span>
+    <span class="ty">char</span>      label[<span class="nm">128</span>];             <span class="cm">// human-readable name</span>
+    <span class="ty">Signature</span> sig;                   <span class="cm">// 384-dim unit vector</span>
+    <span class="ty">float</span>     activation;            <span class="cm">// 0..1, decays 80% each query</span>
+    <span class="ty">float</span>     importance;            <span class="cm">// PageRank score, normalised 0..1</span>
+    <span class="ty">float</span>     entropy_score;         <span class="cm">// 0=prune candidate, 1=keep</span>
+    <span class="ty">float</span>     usage_count;           <span class="cm">// cumulative activation count</span>
+    <span class="ty">bool</span>      in_fast_ring;          <span class="cm">// high-priority node (2048 cap)</span>
+    <span class="ty">bool</span>      auto_created;          <span class="cm">// created by selfgrow</span>
+    <span class="ty">uint32_t</span>  source_id;             <span class="cm">// document provenance (ingest)</span>
+    <span class="ty">char</span>      formula[<span class="nm">128</span>];          <span class="cm">// NODE_PHYSICS only</span>
+    <span class="ty">char</span>      units[<span class="nm">32</span>];             <span class="cm">// NODE_PHYSICS only</span>
+    <span class="ty">char</span>      code_lang[<span class="nm">16</span>];         <span class="cm">// NODE_CODE only</span>
+    <span class="ty">int8_t</span>    hnsw_layer;            <span class="cm">// HNSW index layer (-1=not indexed)</span>
+} <span class="ty">SRHNNode3</span>;</code></pre>
+</section>
+
+<!-- ═══════════ SECTION 8: API REFERENCE ═══════════ -->
+<section id="api-reference">
+  <h1>API <span class="accent">Reference</span></h1>
+</section>
+
+<section id="api-core">
+  <h2>Core Network API</h2>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">SRHNNetwork4 *</span> <span class="fname">srhn4_create</span>(<span class="param"><span class="ptype">void</span></span>)
+    </div>
+    <div class="api-card-body">
+      <p>Allocate and initialise a new SRHN network. Initialises node/edge arrays, HNSW index, episodic memory, RNG, and all pthread locks. Always check for NULL return.</p>
+      <div class="api-returns"><strong>Returns:</strong> pointer to heap-allocated network, or NULL on OOM.</div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">void</span> <span class="fname">srhn4_destroy</span>(<span class="param"><span class="ptype">SRHNNetwork4 *</span>net</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Free all memory, close WAL, release LLM context, destroy pthread locks. Safe to call with NULL.</p>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">uint32_t</span> <span class="fname">srhn4_add_node</span>(<span class="param"><span class="ptype">SRHNNetwork4 *</span>net, <span class="ptype">const char *</span>label, <span class="ptype">NodeType</span> type, <span class="ptype">LangID</span> lang</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Create a new node, compute its embedding via <code>srhn4_embed_text()</code>, insert into the HNSW index, append a WAL entry. Thread-safe (acquires node write lock).</p>
+      <div class="api-params">
+        <div class="api-param-row"><span class="api-param-name">label</span><span class="api-param-desc">Human-readable text. The embedding is computed from this string.</span></div>
+        <div class="api-param-row"><span class="api-param-name">type</span><span class="api-param-desc">NODE_CONCEPT, NODE_PHYSICS, NODE_CODE, etc. Affects visualisation and LLM template selection.</span></div>
+        <div class="api-param-row"><span class="api-param-name">lang</span><span class="api-param-desc">LANG_ENGLISH, LANG_HINDI, etc. Used for cross-language resonance discounting.</span></div>
+      </div>
+      <div class="api-returns"><strong>Returns:</strong> node ID (0-indexed), or UINT32_MAX on failure.</div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">void</span> <span class="fname">srhn4_connect</span>(<span class="param"><span class="ptype">SRHNNetwork4 *</span>net, <span class="ptype">uint32_t</span> a, <span class="ptype">uint32_t</span> b, <span class="ptype">float</span> weight, <span class="ptype">EdgeType</span> type</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Create a bidirectional edge between nodes a and b. If the edge already exists, updates its weight. Grows neighbor arrays dynamically. Appends WAL entry. <strong>Weight must be in [0.001, 1.0]</strong> — clamped automatically.</p>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">SRHNResult4</span> <span class="fname">srhn4_query</span>(<span class="param"><span class="ptype">SRHNNetwork4 *</span>net, <span class="ptype">const char *</span>input</span>)
+    </div>
+    <div class="api-card-body">
+      <p>The main entry point. Runs the complete 19-step pipeline. Thread-safe for concurrent callers — the LLM call is serialised via <code>query_lock</code>, graph reads use rwlock.</p>
+      <div class="api-returns"><strong>Returns:</strong> <code>SRHNResult4</code> on the stack — copy it if you need to keep it after the next call.</div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">void</span> <span class="fname">srhn4_feedback</span>(<span class="param"><span class="ptype">SRHNNetwork4 *</span>net, <span class="ptype">uint32_t</span> query_id, <span class="ptype">float</span> reward</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Submit a reward signal after a query. <code>reward</code> ∈ [-1.0, 1.0]. Triggers Hebbian weight update, contrastive signature update, entropy adjustment, and calibration table update.</p>
+      <div class="api-params">
+        <div class="api-param-row"><span class="api-param-name">query_id</span><span class="api-param-desc">Use <code>net-&gt;query_counter</code> immediately after <code>srhn4_query()</code>.</span></div>
+        <div class="api-param-row"><span class="api-param-name">reward</span><span class="api-param-desc">+1.0 = perfect, 0.0 = neutral, -1.0 = wrong/harmful response.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="api-embed">
+  <h2>Embedding API</h2>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">bool</span> <span class="fname">srhn4_embed_load_glove</span>(<span class="param"><span class="ptype">SRHNNetwork4 *</span>net, <span class="ptype">const char *</span>path</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Load GloVe text-format vectors (e.g., <code>glove.6B.300d.txt</code>). Parses up to 400K word vectors, normalises to unit length, builds a hash table for O(1) lookup. Projects 300→384 via random orthogonal matrix. Call <em>once</em> before the first query.</p>
+      <div class="api-returns"><strong>Returns:</strong> true if at least 1 vector loaded. Network falls back to n-gram if not called.</div>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">float</span> <span class="fname">srhn4_resonance</span>(<span class="param"><span class="ptype">const Signature *</span>a, <span class="ptype">const Signature *</span>b</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Cosine similarity between two unit-normalised 384-dim vectors, with cross-language discount (0.82×) and hash pre-filter. Returns [0, 1].</p>
+    </div>
+  </div>
+</section>
+
+<section id="api-hnsw">
+  <h2>HNSW Index API</h2>
+  <p>The HNSW index is built into <code>SRHNNetwork4.hnsw</code> and managed automatically. You only need these functions if building a custom index or doing bulk operations.</p>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">int</span> <span class="fname">srhn4_hnsw_search</span>(<span class="param"><span class="ptype">HNSWIndex *</span>idx, <span class="ptype">const Signature *</span>query, <span class="ptype">uint32_t</span> ef, <span class="ptype">uint32_t *</span>result_ids, <span class="ptype">float *</span>result_dists, <span class="ptype">int</span> k, <span class="ptype">SRHNNetwork4 *</span>net</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Search for k approximate nearest neighbours. <code>ef</code> controls recall/speed tradeoff — higher ef = better recall, slower search. Default: <code>HNSW_EF_SEARCH = 64</code>.</p>
+      <div class="api-params">
+        <div class="api-param-row"><span class="api-param-name">result_ids</span><span class="api-param-desc">Output array of node IDs, sorted by ascending distance.</span></div>
+        <div class="api-param-row"><span class="api-param-name">result_dists</span><span class="api-param-desc">Output distances (1 - cosine_sim). Similarity = 1 - dist.</span></div>
+      </div>
+      <div class="api-returns"><strong>Returns:</strong> number of results found (≤ k).</div>
+    </div>
+  </div>
+</section>
+
+<section id="api-reasoning">
+  <h2>Reasoning API</h2>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">void</span> <span class="fname">srhn4_causal_path</span>(<span class="param"><span class="ptype">SRHNNetwork4 *</span>net, <span class="ptype">uint32_t</span> from, <span class="ptype">uint32_t</span> to, <span class="ptype">ReasoningChain *</span>out</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Run Dijkstra's algorithm preferring EDGE_CAUSES/EDGE_CAUSAL edges (50% cost) and avoiding EDGE_CONTRADICTS. Stores the path in <code>out</code> with labels, relations, and per-hop strengths.</p>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">void</span> <span class="fname">srhn4_find_contradictions</span>(<span class="param"><span class="ptype">SRHNNetwork4 *</span>net, <span class="ptype">SRHNResult4 *</span>result</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Scan all pairs of activated nodes with activation &gt; 0.25 for EDGE_CONTRADICTS connections. Populates <code>result.contradictions[]</code>. Call after <code>srhn4_propagate()</code>.</p>
+    </div>
+  </div>
+</section>
+
+<section id="api-memory">
+  <h2>Memory API</h2>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">void</span> <span class="fname">srhn4_working_mem_insert</span>(<span class="param"><span class="ptype">SRHNNetwork4 *</span>net, <span class="ptype">uint32_t</span> node_id, <span class="ptype">float</span> salience</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Insert a node into working memory (16 slots). If already present, updates salience. Evicts lowest-salience slot when full. Working memory nodes receive 10× activation bonus in propagation.</p>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">void</span> <span class="fname">srhn4_episodic_recall</span>(<span class="param"><span class="ptype">SRHNNetwork4 *</span>net, <span class="ptype">const Signature *</span>query_sig, <span class="ptype">int</span> k, <span class="ptype">Episode **</span>out, <span class="ptype">int *</span>n_out</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Find the k most semantically similar past episodes using mean pooling of their key node signatures. Applies a recency bonus that decays over hours. Used internally by <code>srhn4_ctx_blend_query()</code>.</p>
+    </div>
+  </div>
+</section>
+
+<section id="api-llm">
+  <h2>LLM Bridge API</h2>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">bool</span> <span class="fname">srhn4_llm_init</span>(<span class="param"><span class="ptype">LLMContext *</span>llm, <span class="ptype">const char *</span>model_path, <span class="ptype">int</span> n_ctx, <span class="ptype">int</span> threads</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Attempt to <code>dlopen(SRHN_LLAMA_SO)</code> and load the model. <strong>Returns true even if LLM unavailable</strong> — the system falls back to structured template responses. Set <code>model_path = NULL</code> to explicitly use fallback mode.</p>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">void</span> <span class="fname">srhn4_build_context</span>(<span class="param"><span class="ptype">SRHNNetwork4 *</span>net, <span class="ptype">SRHNResult4 *</span>result, <span class="ptype">const char *</span>query, <span class="ptype">char *</span>out, <span class="ptype">int</span> sz</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Build the structured context string that gets injected into the LLM prompt. Includes: top concepts with types, physics formulas, reasoning chains, contradictions, and recent conversation turns. You can call this independently to inspect what context the LLM receives.</p>
+    </div>
+  </div>
+</section>
+
+<section id="api-persist">
+  <h2>Persistence API</h2>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">bool</span> <span class="fname">srhn4_save</span>(<span class="param"><span class="ptype">SRHNNetwork4 *</span>net, <span class="ptype">const char *</span>path</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Write a binary snapshot. Format: header (magic 0x53524833, version, counts) + node blobs (fixed + dynamic neighbor arrays) + hyperedges + lexicon + physics laws + stats + calibration table. After a successful save, the WAL file is truncated.</p>
+    </div>
+  </div>
+
+  <div class="api-card">
+    <div class="api-card-head">
+      <span class="ret">void</span> <span class="fname">srhn4_export_json</span>(<span class="param"><span class="ptype">SRHNNetwork4 *</span>net, <span class="ptype">const char *</span>path</span>)
+    </div>
+    <div class="api-card-body">
+      <p>Export graph as JSON for the visualizer. Includes: all non-pruned nodes with full metadata, all neighbour-pair edges and hyperedges, and stats block. The visualizer (<code>srhn_v4_visualizer.html</code>) reads this format directly.</p>
+    </div>
+  </div>
+</section>
+
+<section id="api-rest">
+  <h2>REST API Endpoints</h2>
+
+  <div class="table-wrap"><table>
+    <tr><th>Method</th><th>Path</th><th>Body / Params</th><th>Response</th></tr>
+    <tr><td>GET</td><td><code>/health</code></td><td>—</td><td><code>{"status":"ok","version":"3.0.0"}</code></td></tr>
+    <tr><td>POST</td><td><code>/query</code></td><td><code>{"q":"..."}</code></td><td>Full SRHNResult4 as JSON</td></tr>
+    <tr><td>POST</td><td><code>/feedback</code></td><td><code>{"query_id":N,"reward":0.9}</code></td><td><code>{"status":"ok"}</code></td></tr>
+    <tr><td>GET</td><td><code>/stats</code></td><td>—</td><td>SRHNStats3 as JSON</td></tr>
+    <tr><td>GET</td><td><code>/graph</code></td><td>—</td><td>Full graph JSON (can be large)</td></tr>
+    <tr><td>POST</td><td><code>/ingest</code></td><td><code>{"text":"...","source_id":N}</code></td><td><code>{"status":"ok","nodes":N}</code></td></tr>
+  </table></div>
+
+  <pre><code class="code-label">bash — example curl calls</code><code><span class="cm"># Query with full result inspection</span>
+curl -s -X POST http://localhost:8765/query \
+  -H 'Content-Type: application/json' \
+  -d '{"q":"explain quantum entanglement"}' | python3 -m json.tool
+
+<span class="cm"># Positive feedback for last query</span>
+curl -s -X POST http://localhost:8765/feedback \
+  -d '{"query_id":1,"reward":0.85}' \
+  -H 'Content-Type: application/json'
+
+<span class="cm"># Ingest a Wikipedia excerpt</span>
+curl -s -X POST http://localhost:8765/ingest \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"Photosynthesis is the process used by plants to convert light energy into chemical energy...","source_id":42}'
+
+<span class="cm"># Export graph → feed to visualizer</span>
+curl -s http://localhost:8765/graph > /tmp/srhn4_state.json</code></pre>
+</section>
+
+<section id="api-training">
+  <h2>Training API</h2>
+  <pre><code class="code-label">c</code><code><span class="cm">// Initialize training state</span>
+<span class="ty">TrainState</span> ts;
+<span class="fn">srhn_train_init</span>(&amp;ts, <span class="nm">0.04f</span>);   <span class="cm">// learning rate</span>
+<span class="fn">srhn_train_load_builtin</span>(&amp;ts.dataset); <span class="cm">// 120+ built-in samples</span>
+
+<span class="cm">// Run training</span>
+<span class="fn">srhn_train_run</span>(net, &amp;ts, <span class="nm">10</span>);   <span class="cm">// 10 epochs</span>
+<span class="fn">srhn_train_benchmark</span>(net, &amp;ts); <span class="cm">// 18-query benchmark</span>
+
+<span class="cm">// Export results</span>
+<span class="fn">srhn_train_export_json</span>(net, &amp;ts, <span class="st">"/tmp/srhn4_train.json"</span>);
+<span class="fn">srhn_train_export_csv</span>(&amp;ts, <span class="st">"/tmp/srhn4_train.csv"</span>);
+
+<span class="cm">// Add a custom sample</span>
+<span class="kw">const char</span> *concepts[] = {<span class="st">"photosynthesis"</span>, <span class="st">"chlorophyll"</span>, <span class="st">"light energy"</span>, <span class="st">"glucose"</span>};
+<span class="fn">srhn_train_add_sample</span>(&amp;ts.dataset,
+    <span class="st">"how does photosynthesis work"</span>,
+    concepts, <span class="nm">4</span>,
+    <span class="st">"light → chlorophyll → electron excitation → ATP → glucose"</span>,
+    <span class="kw">NULL</span>, <span class="nm">0</span>,
+    <span class="st">"biology"</span>, LANG_ENGLISH, <span class="nm">0.4f</span>);</code></pre>
+</section>
+
+<!-- ═══════════ SECTION 9: CONSTANTS ═══════════ -->
+<section id="constants">
+  <h1>Tunable <span class="accent">Constants</span></h1>
+  <p>All constants are in <code>include/srhn_v4.h</code>. Recompile after changing any of them.</p>
+
+  <div class="table-wrap"><table>
+    <tr><th>Constant</th><th>Default</th><th>Effect of increasing</th><th>Effect of decreasing</th></tr>
+    <tr><td>EMBED_DIM</td><td>384</td><td>Better semantic precision, more RAM</td><td>Faster, less accurate</td></tr>
+    <tr><td>RESONANCE_THRESH</td><td>0.12</td><td>Fewer seeds, faster but misses edge cases</td><td>More seeds, richer activation</td></tr>
+    <tr><td>SPIKE_DECAY</td><td>0.72</td><td>Activation spreads further from seed</td><td>Tight local activation</td></tr>
+    <tr><td>PRUNE_THRESH</td><td>0.08</td><td>Aggressive pruning, smaller graph</td><td>Graph grows unboundedly</td></tr>
+    <tr><td>MAX_HOPS</td><td>12</td><td>Deeper reasoning chains, slower</td><td>Shallow chains, faster</td></tr>
+    <tr><td>HNSW_M</td><td>16</td><td>Better recall, more index memory</td><td>Faster insert, lower recall</td></tr>
+    <tr><td>HNSW_EF_SEARCH</td><td>64</td><td>Better seed recall, slower search</td><td>Faster, may miss relevant nodes</td></tr>
+    <tr><td>FAST_RING_CAP</td><td>2048</td><td>More high-priority nodes</td><td>Tighter elite ring</td></tr>
+    <tr><td>WORKING_MEM_SLOTS</td><td>16</td><td>Longer in-context window</td><td>Tighter focus per query</td></tr>
+    <tr><td>EPISODIC_CAP</td><td>10000</td><td>Longer memory, more RAM</td><td>Shorter history</td></tr>
+    <tr><td>PAGERANK_INTERVAL</td><td>100</td><td>Less frequent rank update</td><td>More responsive importance scores</td></tr>
+    <tr><td>FEEDBACK_RING</td><td>512</td><td>Longer feedback history for online learning</td><td>Less history</td></tr>
+  </table></div>
+
+  <div class="qref">
+    <h3>Quick Reference — Critical Paths to Tune</h3>
+    <div class="qref-grid">
+      <div class="qref-item"><span>Accuracy vs Speed:</span> HNSW_EF_SEARCH</div>
+      <div class="qref-item"><span>Graph size:</span> PRUNE_THRESH + RESONANCE_THRESH</div>
+      <div class="qref-item"><span>Multi-turn quality:</span> WORKING_MEM_SLOTS</div>
+      <div class="qref-item"><span>Reasoning depth:</span> MAX_HOPS + SPIKE_DECAY</div>
+      <div class="qref-item"><span>Memory footprint:</span> EMBED_DIM + EPISODIC_CAP</div>
+      <div class="qref-item"><span>Learning responsiveness:</span> PAGERANK_INTERVAL</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 10: ENHANCEMENTS ═══════════ -->
+<section id="enhancements">
+  <h1>Enhancement <span class="accent">Paths</span></h1>
+  <p>Ordered by implementation effort and impact. Each card shows the relevant file to modify.</p>
+
+  <h3>🟢 Easy Wins (1–2 days)</h3>
+  <div class="enh-grid">
+    <div class="enh-card">
+      <div class="enh-card-icon">📚</div>
+      <h4>Add a new knowledge domain</h4>
+      <p>Add physics-style laws or code-style patterns to <code>srhn_utils.c</code>. Follow the <code>srhn4_load_physics()</code> pattern — <code>add_law()</code> + <code>srhn4_add_node()</code> + <code>srhn4_connect()</code>.</p>
+      <span class="diff diff-easy">easy · srhn_utils.c</span>
+    </div>
+    <div class="enh-card">
+      <div class="enh-card-icon">🌐</div>
+      <h4>Extend language detection</h4>
+      <p>Add stopword patterns for Italian, Portuguese, Korean, etc. in <code>srhn4_detect_lang()</code>. Optionally integrate fastText LID model via dlopen.</p>
+      <span class="diff diff-easy">easy · srhn_utils.c</span>
+    </div>
+    <div class="enh-card">
+      <div class="enh-card-icon">📝</div>
+      <h4>Add prompt templates</h4>
+      <p>Add domain-specific prompt templates in <code>auto_prompt_templates()</code>. Templates select based on dominant <code>NodeType</code> in result.</p>
+      <span class="diff diff-easy">easy · srhn_llm.c</span>
+    </div>
+    <div class="enh-card">
+      <div class="enh-card-icon">🧪</div>
+      <h4>Add training samples</h4>
+      <p>Add samples to <code>srhn_train_load_builtin()</code> using the <code>S()</code> macro. Include concept nodes, a causal rule, and 2–4 keywords per sample.</p>
+      <span class="diff diff-easy">easy · srhn_v4_train.c</span>
+    </div>
+  </div>
+
+  <h3>🟡 Medium (3–7 days)</h3>
+  <div class="enh-grid">
+    <div class="enh-card">
+      <div class="enh-card-icon">∿</div>
+      <h4>Real sentence embeddings</h4>
+      <p>Integrate all-MiniLM-L6-v2 (22MB ONNX) via onnxruntime-c. Replace <code>srhn4_embed_text()</code>'s n-gram fallback with real transformer output. EMBED_DIM is already 384 to match.</p>
+      <span class="diff diff-med">medium · srhn_embed.c</span>
+    </div>
+    <div class="enh-card">
+      <div class="enh-card-icon">⟳</div>
+      <h4>Streaming token callback</h4>
+      <p>Add a <code>token_callback(const char *tok, void *userdata)</code> function pointer to <code>LLMContext</code>. Call it per generated token in <code>srhn4_llm_generate()</code> for SSE streaming.</p>
+      <span class="diff diff-med">medium · srhn_llm.c + srhn_api.c</span>
+    </div>
+    <div class="enh-card">
+      <div class="enh-card-icon">📊</div>
+      <h4>Prometheus metrics endpoint</h4>
+      <p>Add <code>GET /metrics</code> in <code>srhn_api.c</code> returning OpenMetrics format. Expose: query latency histograms, node/edge counts, HNSW hit rate, feedback score.</p>
+      <span class="diff diff-med">medium · srhn_api.c</span>
+    </div>
+    <div class="enh-card">
+      <div class="enh-card-icon">🔄</div>
+      <h4>Graph-to-graph federation</h4>
+      <p>Add <code>POST /sync</code> that accepts a JSON graph from another SRHN instance. Merge nodes with similarity &gt; 0.8 and create cross-instance edges.</p>
+      <span class="diff diff-med">medium · srhn_api.c + srhn_core.c</span>
+    </div>
+  </div>
+
+  <h3>🔴 Advanced (1–3 weeks)</h3>
+  <div class="enh-grid">
+    <div class="enh-card">
+      <div class="enh-card-icon">⊙</div>
+      <h4>GPU-accelerated HNSW</h4>
+      <p>Implement a CUDA kernel for cosine similarity computation during HNSW search. The bottleneck in large graphs (&gt;100K nodes) is the inner-product loop in <code>srhn4_resonance()</code>.</p>
+      <span class="diff diff-hard">hard · srhn_hnsw.c + new srhn_hnsw_cuda.cu</span>
+    </div>
+    <div class="enh-card">
+      <div class="enh-card-icon">◈</div>
+      <h4>Multi-model LLM routing</h4>
+      <p>Route queries to different models based on <code>NodeType</code>: CodeLlama for code, Mistral for general, MedLlama for medical. Add model pool and async dispatch in <code>LLMContext</code>.</p>
+      <span class="diff diff-hard">hard · srhn_llm.c</span>
+    </div>
+    <div class="enh-card">
+      <div class="enh-card-icon">🕸</div>
+      <h4>Temporal graph snapshots</h4>
+      <p>Add timestamped snapshot ring. Store edge weights at T, T-1, T-2. Enable time-travel queries: "what did the graph know 2 hours ago?" Compare snapshots for drift detection.</p>
+      <span class="diff diff-hard">hard · srhn_persist.c + srhn_core.c</span>
+    </div>
+    <div class="enh-card">
+      <div class="enh-card-icon">⬡</div>
+      <h4>Hypergraph clustering</h4>
+      <p>Implement spectral clustering over the node embedding matrix. Auto-assign cluster labels. Add <code>GET /clusters</code> endpoint. Use clusters to accelerate cross-domain queries.</p>
+      <span class="diff diff-hard">hard · new srhn_cluster.c</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 11: ADDING A DOMAIN ═══════════ -->
+<section id="adding-domain">
+  <h1>Adding a <span class="accent">Domain</span></h1>
+  <p>Walk-through: adding a Chemistry domain from scratch.</p>
+
+  <h3>Step 1 — Add node loader in srhn_utils.c</h3>
+  <pre><code class="code-label">c — srhn_utils.c</code><code><span class="ty">void</span> <span class="fn">srhn4_load_chemistry</span>(<span class="ty">SRHNNetwork4</span> *net) {
+    <span class="cm">/* Helper: add a law-style node */</span>
+    <span class="kw">static</span> <span class="ty">void</span> (<span class="fn">*add_law</span>)(...) = ...;  <span class="cm">// same pattern as srhn4_load_physics()</span>
+
+    <span class="cm">/* Fundamental chemistry nodes */</span>
+    <span class="ty">uint32_t</span> atom   = <span class="fn">srhn4_add_node</span>(net, <span class="st">"atom element periodic table"</span>, NODE_CONCEPT, LANG_ENGLISH);
+    <span class="ty">uint32_t</span> bond   = <span class="fn">srhn4_add_node</span>(net, <span class="st">"chemical bond covalent ionic"</span>, NODE_CONCEPT, LANG_ENGLISH);
+    <span class="ty">uint32_t</span> react  = <span class="fn">srhn4_add_node</span>(net, <span class="st">"chemical reaction equilibrium"</span>, NODE_CONCEPT, LANG_ENGLISH);
+    <span class="ty">uint32_t</span> ph_node= <span class="fn">srhn4_add_node</span>(net, <span class="st">"pH acid base hydrogen ion"</span>,   NODE_PHYSICS,  LANG_ENGLISH);
+
+    <span class="cm">/* Set physics-specific fields */</span>
+    <span class="kw">if</span> (ph_node != UINT32_MAX) {
+        strncpy(net-&gt;nodes[ph_node].formula, <span class="st">"pH = -log₁₀[H⁺]"</span>, <span class="nm">127</span>);
+        strncpy(net-&gt;nodes[ph_node].units,   <span class="st">"dimensionless"</span>,     <span class="nm">31</span>);
+    }
+
+    <span class="cm">/* Edges */</span>
+    <span class="fn">srhn4_connect</span>(net, atom,  bond,   <span class="nm">0.85f</span>, EDGE_CAUSAL);
+    <span class="fn">srhn4_connect</span>(net, bond,  react,  <span class="nm">0.80f</span>, EDGE_CAUSES);
+    <span class="fn">srhn4_connect</span>(net, react, ph_node,<span class="nm">0.70f</span>, EDGE_ASSOC);
+
+    <span class="cm">/* Causal hyperedge */</span>
+    <span class="ty">uint32_t</span> nodes[] = {atom, bond, react};
+    <span class="fn">srhn4_add_edge</span>(net, nodes, <span class="nm">3</span>, <span class="nm">0.8f</span>, EDGE_CAUSAL,
+        <span class="st">"atoms bond → molecular structure → chemical reactions"</span>);
+}</code></pre>
+
+  <h3>Step 2 — Declare in srhn_v4.h</h3>
+  <pre><code class="code-label">c — include/srhn_v4.h</code><code><span class="cm">/* Add to the utils forward declarations section */</span>
+<span class="ty">void</span>  <span class="fn">srhn4_load_chemistry</span>(<span class="ty">SRHNNetwork4</span> *net);</code></pre>
+
+  <h3>Step 3 — Add training samples in srhn_v4_train.c</h3>
+  <pre><code class="code-label">c — srhn_v4_train.c · srhn_train_load_builtin()</code><code"><span class="cm">/* Add inside srhn_train_load_builtin() */</span>
+S(<span class="st">"what is a covalent bond"</span>,
+  <span class="st">"covalent bond"</span>,<span class="st">"electron sharing"</span>,<span class="st">"molecule"</span>,<span class="st">"orbital"</span>,<span class="st">"Lewis structure"</span>,NULL,NULL,NULL,
+  <span class="st">"atoms share electrons → stable electron configuration → molecule"</span>,
+  <span class="st">"bond"</span>,<span class="st">"electron"</span>,<span class="st">"sharing"</span>,NULL,
+  <span class="st">"chemistry"</span>, LANG_ENGLISH, <span class="nm">0.4f</span>, NODE_CONCEPT);
+
+S(<span class="st">"explain pH and acid base chemistry"</span>,
+  <span class="st">"pH"</span>,<span class="st">"acid"</span>,<span class="st">"base"</span>,<span class="st">"hydrogen ion"</span>,<span class="st">"buffer"</span>,<span class="st">"neutralisation"</span>,NULL,NULL,
+  <span class="st">"pH = -log[H+]; acid: pH&lt;7; base: pH&gt;7; neutral: pH=7"</span>,
+  <span class="st">"pH"</span>,<span class="st">"acid"</span>,<span class="st">"hydrogen"</span>,NULL,
+  <span class="st">"chemistry"</span>, LANG_ENGLISH, <span class="nm">0.3f</span>, NODE_PHYSICS);</code></pre>
+
+  <h3>Step 4 — Call it in the trainer main</h3>
+  <pre><code class="code-label">c — srhn_v4_train_main.c</code><code"><span class="kw">static</span> <span class="ty">void</span> <span class="fn">load_all_kb</span>(<span class="ty">SRHNNetwork4</span> *net) {
+    <span class="fn">srhn4_load_physics</span>(net);
+    <span class="fn">srhn4_load_code</span>(net);
+    <span class="fn">srhn4_load_chemistry</span>(net);  <span class="cm">// ← add here</span>
+    printf(GREEN <span class="st">"KB loaded: %u nodes\n"</span> RST, net-&gt;n_nodes);
+}</code></pre>
+</section>
+
+<!-- ═══════════ SECTION 12: CUSTOM EMBEDDINGS ═══════════ -->
+<section id="custom-embeddings">
+  <h1>Custom <span class="accent">Embeddings</span></h1>
+
+  <h3>Option A — GloVe (recommended for English)</h3>
+  <pre><code class="code-label">bash</code><code">wget http://nlp.stanford.edu/data/glove.6B.zip  <span class="cm"># 822MB</span>
+unzip glove.6B.zip</code></pre>
+  <pre><code class="code-label">c</code><code"><span class="fn">srhn4_embed_load_glove</span>(net, <span class="st">"glove.6B.300d.txt"</span>);</code></pre>
+
+  <h3>Option B — FastText (multilingual)</h3>
+  <pre><code class="code-label">bash</code><code">wget https://dl.fbaipublicfiles.com/fasttext/vectors-wiki/wiki.en.bin  <span class="cm"># 6.7GB</span></code></pre>
+  <pre><code class="code-label">c</code><code"><span class="fn">srhn4_embed_load_fasttext</span>(net, <span class="st">"wiki.en.bin"</span>);</code></pre>
+
+  <h3>Option C — Plug in your own embedding function</h3>
+  <p>The embedding pipeline is designed for replacement. Override by modifying the <code>srhn4_embed_text()</code> function in <code>srhn_embed.c</code>. The required contract is:</p>
+  <pre><code class="code-label">c — contract</code><code"><span class="cm">// Input:  text string + language hint</span>
+<span class="cm">// Output: unit-normalised float[EMBED_DIM] stored in out->vec[]</span>
+<span class="cm">// out->magnitude must be 1.0f after normalisation</span>
+<span class="cm">// out->hash = fnv1a(text) for fast pre-filter</span>
+<span class="cm">// out->lang = lang parameter</span>
+
+<span class="ty">void</span> <span class="fn">your_embed_function</span>(<span class="ty">const char</span> *text, <span class="ty">LangID</span> lang, <span class="ty">Signature</span> *out) {
+    <span class="cm">/* Call your embedding model */</span>
+    <span class="cm">/* Write results into out->vec[0..EMBED_DIM-1] */</span>
+    <span class="cm">/* L2-normalise */</span>
+    <span class="ty">float</span> mag = <span class="nm">0.f</span>;
+    <span class="kw">for</span> (<span class="ty">int</span> i = <span class="nm">0</span>; i &lt; EMBED_DIM; i++) mag += out-&gt;vec[i]*out-&gt;vec[i];
+    mag = sqrtf(mag) + <span class="nm">1e-8f</span>;
+    <span class="kw">for</span> (<span class="ty">int</span> i = <span class="nm">0</span>; i &lt; EMBED_DIM; i++) out-&gt;vec[i] /= mag;
+    out-&gt;magnitude = <span class="nm">1.f</span>;
+}</code></pre>
+
+  <div class="box box-note">
+    <div class="box-title">Note — EMBED_DIM</div>
+    <p>If you change EMBED_DIM from 384, you must recompile everything. The HNSW index, resonance function, and all sig structs use EMBED_DIM at compile time. The projection matrix in <code>srhn_embed.c</code> will also need regenerating.</p>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 13: LLM INTEGRATION ═══════════ -->
+<section id="llm-integration">
+  <h1>LLM <span class="accent">Integration</span></h1>
+
+  <h3>llama.cpp (recommended)</h3>
+  <pre><code class="code-label">bash — build llama.cpp</code><code">git clone https://github.com/ggerganov/llama.cpp
+cd llama.cpp
+make -j$(nproc) libllama.so
+cp libllama.so ../srhn_v4/</code></pre>
+  <pre><code class="code-label">bash — run with LLM</code><code">SRHN_LLAMA_SO=./libllama.so \
+  ./build/srhn4_train \
+  --llm mistral-7b-instruct-v0.1.Q4_K_M.gguf \
+  --interactive</code></pre>
+
+  <h3>Implementing a custom LLM backend</h3>
+  <p>Replace the symbol-loading in <code>srhn4_llm_init()</code> with direct calls to your preferred inference engine. The minimum required interface:</p>
+  <pre><code class="code-label">c — minimum LLM interface</code><code"><span class="cm">// What srhn_llm.c calls on the LLM context handle:</span>
+<span class="ty">int</span> <span class="fn">tokenize</span>(ctx, text, tokens, max_tokens, add_bos);
+<span class="ty">int</span> <span class="fn">eval</span>(ctx, tokens, n, past, n_threads);
+<span class="ty">float*</span> <span class="fn">get_logits</span>(ctx);
+<span class="ty">const char*</span> <span class="fn">token_to_str</span>(ctx, token_id);
+<span class="ty">int</span> <span class="fn">token_eos</span>(void);</code></pre>
+
+  <h3>Connecting OpenAI-compatible APIs</h3>
+  <p>You can replace <code>srhn4_llm_generate()</code> with an HTTP call to any OpenAI-compatible endpoint. The structured context built by <code>srhn4_build_context()</code> works as-is as the system message:</p>
+  <pre><code class="code-label">c — OpenAI-style replacement sketch</code><code"><span class="kw">bool</span> <span class="fn">srhn4_llm_generate_openai</span>(<span class="ty">LLMContext</span> *llm, <span class="kw">const char</span> *prompt,
+                               <span class="kw">char</span> *out, <span class="kw">int</span> max_out) {
+    <span class="cm">// Build JSON: {"model":"gpt-4o-mini","messages":[...]}</span>
+    <span class="cm">// POST to http://localhost:11434/v1/chat/completions (Ollama)</span>
+    <span class="cm">// or https://api.openai.com/v1/chat/completions</span>
+    <span class="cm">// Parse response["choices"][0]["message"]["content"] into out</span>
+    <span class="kw">return</span> out[<span class="nm">0</span>] != <span class="st">'\0'</span>;
+}</code></pre>
+
+  <h3>Fallback mode (no LLM)</h3>
+  <p>When no LLM is loaded, <code>srhn4_answer()</code> calls the internal <code>mock_generate()</code> function which builds a structured response directly from the activated nodes, formulas, and reasoning chains. This is fully functional — useful for testing, embedded devices, or when privacy requires zero outbound calls.</p>
+</section>
+
+<!-- ═══════════ SECTION 14: TESTING ═══════════ -->
+<section id="testing">
+  <h1>Testing <span class="accent">Guide</span></h1>
+
+  <h3>Running the test suite</h3>
+  <pre><code class="code-label">bash</code><code">make test                    <span class="cm"># standard run</span>
+make debug && make test      <span class="cm"># with AddressSanitizer</span>
+
+<span class="cm"># Run specific test by grepping output</span>
+./build/srhn_test 2>&1 | grep -A2 "T08"</code></pre>
+
+  <h3>Adding a new test</h3>
+  <pre><code class="code-label">c — tests/srhn_test.c</code><code"><span class="kw">static void</span> <span class="fn">test_chemistry</span>(<span class="ty">void</span>) {
+    <span class="fn">section</span>(<span class="st">"TXX: Chemistry domain"</span>);
+    <span class="ty">SRHNNetwork4</span> *net = <span class="fn">srhn4_create</span>();
+
+    <span class="fn">srhn4_load_chemistry</span>(net);  <span class="cm">// your new function</span>
+
+    <span class="fn">EXPECT</span>(net-&gt;n_nodes &gt; <span class="nm">5</span>, <span class="st">"chemistry nodes loaded"</span>);
+
+    <span class="ty">SRHNResult4</span> r = <span class="fn">srhn4_query</span>(net, <span class="st">"what is a covalent bond"</span>);
+    <span class="fn">EXPECT</span>(r.confidence &gt; <span class="nm">0.2f</span>, <span class="st">"chemistry query returns confidence"</span>);
+    <span class="fn">EXPECT</span>(r.response[<span class="nm">0</span>] != <span class="st">'\0'</span>, <span class="st">"response non-empty"</span>);
+
+    <span class="fn">srhn4_destroy</span>(net);
+}
+
+<span class="cm">// Then add test_chemistry() call inside main()</span></code></pre>
+
+  <h3>Test macro reference</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Macro</th><th>Usage</th></tr>
+    <tr><td><code>EXPECT(cond, msg)</code></td><td>Fails if condition is false</td></tr>
+    <tr><td><code>EXPECT_NEAR(a, b, tol, msg)</code></td><td>Fails if |a-b| &gt; tol</td></tr>
+    <tr><td><code>EXPECT_GT(a, b, msg)</code></td><td>Fails if a &lt;= b</td></tr>
+    <tr><td><code>EXPECT_LT(a, b, msg)</code></td><td>Fails if a &gt;= b</td></tr>
+    <tr><td><code>EXPECT_NE(a, b, msg)</code></td><td>Fails if a == b</td></tr>
+  </table></div>
+
+  <h3>Performance benchmarking</h3>
+  <pre><code class="code-label">bash</code><code"><span class="cm"># Benchmark 18 standard queries</span>
+./build/srhn4_train --benchmark
+
+<span class="cm"># Measure raw query throughput</span>
+time for i in $(seq 100); do
+  curl -s -X POST http://localhost:8765/query \
+    -d '{"q":"Newton second law"}' \
+    -H 'Content-Type: application/json' > /dev/null
+done</code></pre>
+</section>
+
+<!-- ═══════════ SECTION 15: PERFORMANCE ═══════════ -->
+<section id="performance">
+  <h1>Performance <span class="accent">Notes</span></h1>
+
+  <div class="table-wrap"><table>
+    <tr><th>Operation</th><th>Complexity</th><th>Typical Latency</th><th>Notes</th></tr>
+    <tr><td>Node insertion</td><td>O(log n) amortised</td><td>&lt;1ms</td><td>HNSW insert dominates</td></tr>
+    <tr><td>Seed search (HNSW)</td><td>O(log n)</td><td>0.1–2ms at 50K nodes</td><td>ef=64, M=16</td></tr>
+    <tr><td>BFS propagation</td><td>O(activated × neighbors)</td><td>0.5–5ms</td><td>Bounded by MAX_ACTIVATED</td></tr>
+    <tr><td>PageRank (20 iter)</td><td>O(n × avg_degree)</td><td>20–100ms at 10K nodes</td><td>Every 100 queries</td></tr>
+    <tr><td>Full query (no LLM)</td><td>—</td><td>2–15ms</td><td>Depends on graph size</td></tr>
+    <tr><td>Full query (with LLM)</td><td>—</td><td>200ms–3s</td><td>Dominated by LLM generation</td></tr>
+    <tr><td>Binary save (10K nodes)</td><td>O(n)</td><td>&lt;50ms</td><td>WAL reduces frequency needed</td></tr>
+  </table></div>
+
+  <h3>Memory usage at scale</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Graph size</th><th>Node array</th><th>HNSW index</th><th>Embeddings (GloVe)</th><th>Total approx.</th></tr>
+    <tr><td>1K nodes</td><td>~2MB</td><td>~0.5MB</td><td>—</td><td>~5MB</td></tr>
+    <tr><td>10K nodes</td><td>~20MB</td><td>~5MB</td><td>—</td><td>~30MB</td></tr>
+    <tr><td>100K nodes</td><td>~200MB</td><td>~50MB</td><td>—</td><td>~260MB</td></tr>
+    <tr><td>+ GloVe 300d</td><td>—</td><td>—</td><td>~1.5GB</td><td>+1.5GB</td></tr>
+  </table></div>
+
+  <div class="box box-tip">
+    <div class="box-title">Tip — Embedded / Low-Memory Systems</div>
+    <p>For constrained environments: set <code>EPISODIC_CAP=500</code>, <code>EMBED_DIM=128</code> (recompile), and disable GloVe loading. The n-gram fallback still provides useful associative recall at a fraction of the memory cost.</p>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 16: REST DEPLOY ═══════════ -->
+<section id="rest-deploy">
+  <h1>REST Server <span class="accent">Deployment</span></h1>
+
+  <h3>Systemd service (Linux)</h3>
+  <pre><code class="code-label">ini — /etc/systemd/system/srhn3.service</code><code">[Unit]
+Description=SRHN v4 Knowledge Graph API
+After=network.target
+
+[Service]
+Type=simple
+User=srhn
+WorkingDirectory=/opt/srhn_v4
+ExecStartPre=/opt/srhn_v4/build/srhn4_train --epochs 0
+ExecStart=/opt/srhn_v4/build/srhn4_train --serve --port 8765 --quiet
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+
+  <h3>Nginx reverse proxy</h3>
+  <pre><code class="code-label">nginx</code><code">location /srhn/ {
+    proxy_pass http://127.0.0.1:8765/;
+    proxy_set_header Host $host;
+    add_header Access-Control-Allow-Origin *;
+}</code></pre>
+</section>
+
+<!-- ═══════════ SECTION 17: PYTHON CLIENT ═══════════ -->
+<section id="python-client">
+  <h1>Python <span class="accent">Client</span></h1>
+  <pre><code class="code-label">python</code><code"><span class="kw">from</span> srhn_client <span class="kw">import</span> SRHNClient
+
+client = SRHNClient(<span class="st">"http://localhost:8765"</span>)
+
+<span class="cm"># Check server</span>
+print(client.health())  <span class="cm"># {"status": "ok", "version": "3.0.0"}</span>
+
+<span class="cm"># Query with pretty print</span>
+client.pretty_query(<span class="st">"what is quantum entanglement"</span>)
+
+<span class="cm"># Raw result dict</span>
+r = client.query(<span class="st">"explain backpropagation"</span>)
+print(r[<span class="st">'confidence'</span>], r[<span class="st">'n_chains'</span>], r[<span class="st">'response'</span>])
+
+<span class="cm"># Ingest a document</span>
+client.ingest(<span class="st">"Photosynthesis converts sunlight into glucose..."</span>, source_id=<span class="nm">1</span>)
+
+<span class="cm"># Feedback</span>
+client.feedback(query_id=<span class="nm">1</span>, reward=<span class="nm">0.85</span>)
+
+<span class="cm"># Interactive REPL</span>
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    client.interactive_repl()</code></pre>
+</section>
+
+<!-- ═══════════ SECTION 18: VISUALIZER ═══════════ -->
+<section id="visualizer">
+  <h1>Visualizer <span class="accent">Guide</span></h1>
+
+  <h3>Loading data</h3>
+  <p>The visualizer (<code>srhn_v4_visualizer.html</code>) accepts two JSON formats:</p>
+  <ul>
+    <li><strong>Graph JSON</strong> — from <code>srhn4_export_json()</code> or <code>GET /graph</code>. Contains <code>nodes[]</code>, <code>edges[]</code>, <code>stats{}</code>.</li>
+    <li><strong>Training JSON</strong> — from <code>srhn_train_export_json()</code>. Contains <code>training{}</code>, <code>history[]</code>, <code>domains[]</code>. Renders the training chart.</li>
+  </ul>
+
+  <h3>Controls</h3>
+  <div class="table-wrap"><table>
+    <tr><th>Interaction</th><th>Action</th></tr>
+    <tr><td>Click node</td><td>Open node inspector (embedding, PageRank, formula, neighbors)</td></tr>
+    <tr><td>⚡ API mode</td><td>Connect to live REST server at localhost:8765</td></tr>
+    <tr><td>Live query bar</td><td>Send query to API, show chains + contradictions in right panel</td></tr>
+    <tr><td>⟳ Live</td><td>Poll every 2.5s for graph updates</td></tr>
+    <tr><td>Edge filter dropdown</td><td>Show only one edge type (e.g., CONTRADICTS = red dashed)</td></tr>
+    <tr><td>Node type chips</td><td>Toggle visibility of NODE_PHYSICS, NODE_CODE, etc.</td></tr>
+    <tr><td>Scroll wheel</td><td>Zoom (0.08× – 6×)</td></tr>
+    <tr><td>Drag on canvas</td><td>Pan view</td></tr>
+    <tr><td>Drag node</td><td>Repin node position (stops physics on that node)</td></tr>
+    <tr><td>Space bar</td><td>Pause/resume physics simulation</td></tr>
+    <tr><td>C key</td><td>Centre view on all visible nodes</td></tr>
+    <tr><td>R key</td><td>Randomise layout (restart physics)</td></tr>
+  </table></div>
+</section>
+
+<!-- ═══════════ SECTION 19: REAL-WORLD ═══════════ -->
+<section id="real-world">
+  <h1>Real-World <span class="accent">Patterns</span></h1>
+
+  <h3>Pattern 1 — Offline Medical Decision Support</h3>
+  <p>Deploy on a hospital server with no internet. Ingest drug interaction tables and clinical guidelines via <code>POST /ingest</code>. The CONTRADICTS edge type between treatment pathways provides the safety layer before any LLM response is delivered to clinical staff. The WAL ensures the knowledge base survives power cycles without re-ingestion.</p>
+
+  <h3>Pattern 2 — Adaptive Tutoring System</h3>
+  <p>Each student gets their own <code>SRHNNetwork4</code> instance loaded from a binary snapshot. Call <code>srhn4_feedback(net, query_id, +1.0)</code> when the student answers correctly and <code>-1.0</code> when wrong. The Hebbian learning gradually reshapes the activation weights toward topics the student understands, and away from topics they confuse. The episodic memory tracks which questions they've seen before.</p>
+
+  <h3>Pattern 3 — IoT Knowledge Edge Node</h3>
+  <p>Compile with <code>make release</code> (400KB binary). Flash to an ARM Cortex-A device. Pre-load domain knowledge at factory time via <code>srhn4_save()</code>. The device answers sensor queries locally with sub-10ms latency. The WAL write on every feedback call means field learning survives hard reboots.</p>
+
+  <h3>Pattern 4 — RAG Pre-Filter for Cloud LLM</h3>
+  <p>Use SRHN as the retrieval layer before calling GPT-4 or Gemini. Call <code>srhn4_build_context()</code> directly — this gives you the structured context string without triggering the built-in LLM. Inject that context into your cloud LLM prompt. You get SRHN's reasoning chains and contradiction detection for free, with cloud-quality text generation.</p>
+
+  <pre><code class="code-label">c — RAG pre-filter pattern</code><code"><span class="ty">SRHNResult4</span> r = <span class="fn">srhn4_query</span>(net, user_query);
+
+<span class="cm">// Get the structured context SRHN built</span>
+<span class="ty">char</span> context[CONTEXT_BUF_SIZE];
+<span class="fn">srhn4_build_context</span>(net, &amp;r, user_query, context, <span class="kw">sizeof</span>(context));
+
+<span class="cm">// Send to your cloud LLM</span>
+<span class="fn">your_openai_call</span>(system_prompt=context, user_message=user_query, out=response);</code></pre>
+</section>
+
+<!-- ═══════════ SECTION 20: CHANGELOG ═══════════ -->
+<section id="changelog">
+  <h1>v2 → v3 <span class="accent">Migration</span></h1>
+
+  <div class="compare">
+    <div class="compare-col">
+      <div class="compare-title old">v2 API</div>
+      <pre style="margin:0;border:none;background:none;padding:0"><code style="padding:0;font-size:11.5px;background:none;border:none">srhn2_compute_signature()
+srhn2_resonance()
+O(n) linear node scan
+SIG_DIM  (128)
+net->stats.total_queries
+SRHNResult2
+SRHNNode2.sig.vec[SIG_DIM]
+srhn2_add_node()
+srhn2_connect()
+srhn2_query()
+srhn2_feedback()
+srhn2_save() / srhn2_load()
+srhn2_export_json()</code></pre>
+    </div>
+    <div class="compare-col">
+      <div class="compare-title new">v3 API</div>
+      <pre style="margin:0;border:none;background:none;padding:0"><code style="padding:0;font-size:11.5px;background:none;border:none">srhn4_embed_text()
+srhn4_resonance()
+srhn4_hnsw_search()  O(log n)
+EMBED_DIM  (384)
+net->query_counter
+SRHNResult4  (+ chains, contradictions)
+SRHNNode3.sig.vec[EMBED_DIM]
+srhn4_add_node()
+srhn4_connect()
+srhn4_query()
+srhn4_feedback()
+srhn4_save() / srhn4_load()
+srhn4_export_json()</code></pre>
+    </div>
+  </div>
+
+  <h3>New in v3 (no v2 equivalent)</h3>
+  <ul>
+    <li><code>srhn4_hnsw_insert()</code> / <code>srhn4_hnsw_search()</code> — O(log n) ANN index</li>
+    <li><code>srhn4_run_pagerank()</code> — continuous node importance scoring</li>
+    <li><code>srhn4_causal_path()</code> — A* causal path finding</li>
+    <li><code>srhn4_find_contradictions()</code> — EDGE_CONTRADICTS detection</li>
+    <li><code>srhn4_build_context()</code> — structured LLM context builder</li>
+    <li><code>srhn4_ground_response()</code> — hallucination check</li>
+    <li><code>srhn4_episodic_recall()</code> — similarity-based episode retrieval</li>
+    <li><code>srhn4_working_mem_insert()</code> — salience-based working memory</li>
+    <li><code>srhn4_calibrate()</code> / <code>srhn4_calibrated_conf()</code> — isotonic calibration</li>
+    <li><code>srhn4_wal_open()</code> / <code>srhn4_wal_replay()</code> — crash-safe WAL</li>
+    <li><code>srhn4_ingest_document()</code> — streaming document ingestion</li>
+  </ul>
+</section>
+
+<!-- ═══════════ SECTION 21: BUGS FIXED ═══════════ -->
+<section id="bugs-fixed">
+  <h1>Bugs <span class="accent">Fixed from v1/v2</span></h1>
+  <div class="table-wrap"><table>
+    <tr><th>ID</th><th>Description</th><th>Fix</th></tr>
+    <tr><td>BUG-1</td><td>JSON export: neighbour edges never emitted (<code>!first_edge == false</code> always TRUE)</td><td>Rewrote neighbour-pair JSON loop</td></tr>
+    <tr><td>BUG-2</td><td><code>srhn2_connect()</code> ignored <code>weight</code> parameter</td><td>Parameter now stored correctly</td></tr>
+    <tr><td>BUG-3</td><td>Feedback signature update was dead code stub</td><td>Full contrastive update implemented</td></tr>
+    <tr><td>BUG-4</td><td>Static arrays ~600MB stack allocation</td><td>Heap allocation throughout</td></tr>
+    <tr><td>BUG-5</td><td>Neighbour cap of 32 causing silent link drops</td><td>Dynamic realloc up to MAX_NEIGHBORS=256</td></tr>
+    <tr><td>BUG-6</td><td><code>srhn_prune_pass</code> never updated <code>total_edges</code></td><td>Edge counter updated on prune</td></tr>
+    <tr><td>BUG-7</td><td><code>visited[]</code> array was 64KB on stack in propagation</td><td>Heap allocation per propagation call</td></tr>
+    <tr><td>BUG-8</td><td>Feedback stored active nodes AFTER activation decayed</td><td>Snapshot taken before decay step</td></tr>
+    <tr><td>BUG-9</td><td>Rolling avg latency formula used unused query counter</td><td>EWMA using correct counter</td></tr>
+    <tr><td>BUG-10</td><td>Bidirectional connect silently discarded weight arg</td><td>Both directions store the same weight</td></tr>
+    <tr><td>BUG-11</td><td>PAV calibration loop infinite on non-monotone data</td><td>Single-pass block algorithm, bounded iterations</td></tr>
+    <tr><td>BUG-12</td><td>Physics O(n²) cross-connect hanging at startup</td><td>HNSW-bounded: top-8 nearest only</td></tr>
+  </table></div>
+</section>
+
+<!-- ═══════════ SECTION 22: GLOSSARY ═══════════ -->
+<section id="glossary">
+  <h1><span class="accent">Glossary</span></h1>
+  <div class="table-wrap"><table>
+    <tr><th>Term</th><th>Definition</th></tr>
+    <tr><td>Signature</td><td>A unit-normalised 384-dim float vector representing the semantic content of a node or query. Stored in <code>Signature.vec[]</code>.</td></tr>
+    <tr><td>Resonance</td><td>Cosine similarity between two Signatures. Range [0,1]. Values above RESONANCE_THRESH (0.12) are considered semantically related.</td></tr>
+    <tr><td>Activation</td><td>Per-node float [0,1] representing how "active" a node is in the current query context. Decays by 80% before each new query.</td></tr>
+    <tr><td>Spike decay</td><td>The factor (0.72) by which activation weakens at each BFS hop. Controls how far activation propagates from seed nodes.</td></tr>
+    <tr><td>Fast ring</td><td>A priority set of up to 2048 nodes that receive a 1.15× resonance bonus and are never auto-pruned. Promoted via PageRank or manual calls to <code>srhn4_promote_fast()</code>.</td></tr>
+    <tr><td>HNSW</td><td>Hierarchical Navigable Small World — a probabilistic graph structure enabling O(log n) approximate nearest-neighbour search over high-dimensional vectors.</td></tr>
+    <tr><td>Hebbian learning</td><td>"Neurons that fire together wire together." When two nodes are co-activated and receive positive feedback, the edge between them strengthens by lr×reward×act_a×act_b.</td></tr>
+    <tr><td>PageRank</td><td>Iterative algorithm assigning importance scores to nodes based on the number and quality of connections. Run every 100 queries. Stored in <code>node.importance</code>.</td></tr>
+    <tr><td>Causal path</td><td>A directed path through the graph preferring EDGE_CAUSES/EDGE_CAUSAL edges, found via Dijkstra's algorithm. Represents an explainable chain of cause and effect.</td></tr>
+    <tr><td>Contradiction</td><td>Detected when two activated nodes are connected by an EDGE_CONTRADICTS edge and both have activation &gt; 0.25. Injected into the LLM prompt as a warning.</td></tr>
+    <tr><td>Grounding</td><td>Post-generation verification that the LLM's response is consistent with the graph. Adds warning annotations if contradiction nodes appear in the response.</td></tr>
+    <tr><td>Working memory</td><td>16-slot high-salience buffer. Nodes here receive 10× activation bonus in the next query. Decays 20% per query. Simulates short-term memory focus.</td></tr>
+    <tr><td>Episodic memory</td><td>Circular buffer of up to 10K past queries with key node IDs, confidence, and reward. Recalled by cosine similarity with recency bonus.</td></tr>
+    <tr><td>WAL</td><td>Write-Ahead Log. Appends CRC32-protected operations (add_node, add_edge, update_weight, prune) before they're applied. Replayed on crash recovery.</td></tr>
+    <tr><td>Self-grow</td><td>When a query has low resonance (&lt;0.18), SRHN creates new nodes for novel tokens in the query, connecting them to existing near-neighbours via HNSW.</td></tr>
+    <tr><td>Calibration</td><td>Isotonic regression table that maps raw resonance scores to real accuracy probabilities, fitted from feedback history. Enforces monotonicity via PAV algorithm.</td></tr>
+    <tr><td>Context blending</td><td>The effective query signature is a weighted blend of the current query plus the last 4 turns (weights: 0.25, 0.125, 0.0625, 0.03125). Enables multi-turn coherence.</td></tr>
+    <tr><td>Entropy score</td><td>Per-node float [0,1] combining usage rate, recency, and PageRank importance. Nodes below PRUNE_THRESH (0.08) with low usage are candidates for pruning.</td></tr>
+  </table></div>
+</section>
+
+<!-- ── FOOTER ── -->
+<div style="margin-top:60px;padding-top:30px;border-top:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--text2)">
+  SRHN v4 Developer Documentation &nbsp;·&nbsp; C11 &nbsp;·&nbsp; 7,033 lines &nbsp;·&nbsp; 69/69 tests &nbsp;·&nbsp; Zero external dependencies
+</div>
+
+</main>
+</div>
+
+<script>
+// Active sidebar link tracking
+const sections = document.querySelectorAll('section[id]');
+const navLinks  = document.querySelectorAll('nav a');
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`nav a[href="#${e.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -75% 0px' });
+
+sections.forEach(s => obs.observe(s));
+
+// Smooth scroll for nav links
+navLinks.forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const id = a.getAttribute('href').slice(1);
+    document.getElementById(id)?.scrollIntoView({behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>

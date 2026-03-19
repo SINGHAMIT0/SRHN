@@ -1,0 +1,55 @@
+## SRHN v4 — Docker Compose production stack
+## Services: srhn-api (C engine) + srhn-viz (static file server)
+##
+## Usage:
+##   docker-compose up -d
+##   docker-compose logs -f srhn-api
+##   curl http://localhost:8765/health
+##   open http://localhost:3000/visualizer.html
+
+version: '3.8'
+
+services:
+
+  ## ── SRHN Engine (C REST API) ──────────────────────────────────
+  srhn-api:
+    build: .
+    container_name: srhn4-api
+    restart: unless-stopped
+    ports:
+      - "8765:8765"
+    volumes:
+      - srhn-data:/data/srhn
+    environment:
+      - SRHN_PORT=8765
+      - SRHN_EPOCHS=10
+      - SRHN_LLAMA_SO=/app/libllama.so   # optional: mount your libllama.so
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8765/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '4.0'
+
+  ## ── Visualizer (nginx static) ─────────────────────────────────
+  srhn-viz:
+    image: nginx:alpine
+    container_name: srhn4-viz
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    volumes:
+      - ./srhn_v4_visualizer.html:/usr/share/nginx/html/visualizer.html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      srhn-api:
+        condition: service_healthy
+
+volumes:
+  srhn-data:
+    driver: local
