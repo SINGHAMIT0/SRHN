@@ -1,0 +1,29 @@
+{
+  "name": "SRHN v4 Research Edition",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+  "postCreateCommand": "sudo apt-get update -qq && sudo apt-get install -y build-essential gcc make python3 curl && cd /workspaces/srhn_v4 && make all 2>&1 | tail -5 && echo 'Build complete! Run: make test'",
+  "forwardPorts": [8765, 3000],
+  "portsAttributes": {
+    "8765": {
+      "label": "SRHN v4 REST API",
+      "onAutoForward": "notify",
+      "protocol": "http"
+    },
+    "3000": {
+      "label": "Visualizer",
+      "onAutoForward": "openBrowser",
+      "protocol": "http"
+    }
+  },
+  "remoteEnv": {
+    "SRHN_LLAMA_SO": "/workspaces/srhn_v4/libllama.so"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-vscode.cpptools", "ms-vscode.cmake-tools"],
+      "settings": {
+        "C_Cpp.default.includePath": ["${workspaceFolder}/include"]
+      }
+    }
+  }
+}
